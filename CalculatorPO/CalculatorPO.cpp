@@ -3,7 +3,13 @@
 
 #include <iostream>
 
+#include "Calculator.h"
+
 int main()
 {
-    std::cout << "Hello World!\n";
+    Calculator calculator;
+    while (calculator.isActive())
+    {
+        calculator.run();
+    }
 }
