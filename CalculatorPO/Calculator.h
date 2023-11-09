@@ -21,6 +21,8 @@ public:
 	void run();
 	void getTokens();
 	void solveSequence(int lIndex, int rIndex);
+	void solveCalculation(int index);
+	void solveExpression();
 
 	inline bool isActive()
 	{

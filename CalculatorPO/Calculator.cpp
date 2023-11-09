@@ -1,5 +1,64 @@
 #include "Calculator.h"
 
+void Calculator::solveSequence(int lIndex, int rIndex)
+{
+	for (auto j = lIndex + 1; j < rIndex; j++)
+	{
+		auto& token = tokenList[j];
+		// Search for operator that has the biggest priority in that parenthesis
+		if (token.type() == Token::Type::Operator && token.priority() == tokenList.getMaxPriority(lIndex, rIndex))
+		{
+			solveCalculation(j);
+			break;
+		}
+	}
+}
+
+void Calculator::solveCalculation(int index)
+{
+	auto& token         = tokenList[index];
+	auto leftNumber     = std::stod(tokenList[index - 1].string());
+	auto rightNumber    = std::stod(tokenList[index + 1].string());
+
+    auto result = 0.f;
+
+    switch (token.string()[0]) {
+    default:
+        throw std::invalid_argument("Operator error");
+        return;
+    case '^':
+        result = pow(leftNumber, rightNumber);
+        break;
+	case '#':
+		result = pow(leftNumber, 1.0 / rightNumber);
+		break;
+    case '*':
+        result = leftNumber * rightNumber;
+        break;
+    case '/':
+		if(rightNumber == 0)
+			throw std::invalid_argument("Can not divide by 0");
+        result = leftNumber / rightNumber;
+        break;
+    case '+':
+        result = leftNumber + rightNumber;
+        break;
+    case '-':
+        result = leftNumber - rightNumber;
+        break;
+    }
+
+    tokenList[index - 1] = { Token::Type::Number, std::to_string(result) };
+
+    tokenList.remove(index, 2);
+
+    for (auto i = 0; i < tokenList.size(); i++)
+    {
+        std::cout << tokenList[i].string();
+    }
+    std::cout << '\n';
+}
+
 void Calculator::getTokens()
 {
 	for (auto i = 0; i < consoleExpression.size(); i++)
@@ -8,7 +67,7 @@ void Calculator::getTokens()
 		if (isdigit(c))
 		{
 			const auto startIndex = i;
-			while (isdigit(consoleExpression[i]))
+			while (isdigit(consoleExpression[i]) || consoleExpression[i] == '.')
 				i++;
 
 			const auto number = std::string(consoleExpression, startIndex, i - startIndex);
@@ -64,7 +123,10 @@ void Calculator::getTokens()
 				tokenList.addToken({ type, std::string(1, c), priority, sign, right});
 		}
 	}
+}
 
+void Calculator::solveExpression()
+{
 	while (tokenList.existsParentheses())
 	{
 		auto leftParenthesis = -1;
@@ -92,26 +154,23 @@ void Calculator::getTokens()
 			}
 		}
 
-		for (auto j = leftParenthesis + 1; j < rightParenthesis; j++)
+		if (leftParenthesis != -1 && rightParenthesis != -1)
 		{
-			auto& token = tokenList[j];
-			// Search for operator that has the biggest priority in that parenthesis
-			if (token.type() == Token::Type::Operator && token.priority() == tokenList.getMaxPriority(leftParenthesis, rightParenthesis))
-			{
-				tokenList.solveCalculation(j);
-				break;
-			}
+			solveSequence(leftParenthesis, rightParenthesis);
 		}
 	}
 
-	tokenList.solveCalculation(1);
+	while (tokenList.size() != 1)
+	{
+		solveSequence(0, tokenList.size());
+	}
+
 	tokenList.clear();
 }
 
 void Calculator::run()
 {
 	std::getline(std::cin, consoleExpression);
-	consoleExpression = "((1+2+3)+2+(1+2+3+4))+6";
 	getTokens();
-	tokenList.clear();
+	solveExpression();
 }

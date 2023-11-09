@@ -53,7 +53,6 @@ public:
 	int		getMaxPriority();
 	int		getMaxPriority(int lIndex, int rIndex);
 	bool	existsParentheses();
-	void	solveCalculation(int index);
 	void	remove(int index, int size);
 
 private:
