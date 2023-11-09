@@ -1,4 +1,7 @@
 #pragma once
+
+#define DEFAULT_LIST_SIZE 50
+
 class Token
 {
 public:
@@ -15,9 +18,19 @@ public:
 
 	}
 
-	Token(Type type, int priority, bool sign) : type(type), priority(priority), sign(sign)
+	Token(Type type, const std::string& string, int priority = -1, bool sign = false, bool right = false)
+		: type(type), string_(string), priority(priority), sign(sign), right(false)
 	{
 
+	}
+
+	void operator=(const Token &token)
+	{
+		type = token.type;
+		string_ = token.string_;
+		priority = token.priority;
+		sign = token.sign;
+		right = token.right;
 	}
 
 	inline Type getType()
@@ -35,9 +48,67 @@ public:
 		return sign;
 	}
 
+	inline const std::string& string()
+	{
+		return string_;
+	}
+
 private:
-	const Type	type;
-	const int	priority;
-	const bool	sign;
+	Type		type;
+	int			priority;
+	bool		sign;
+	bool		right;
+	std::string string_;
 };
 
+class TokenList
+{
+public:
+	TokenList()
+	{
+		pTokenList = new Token[DEFAULT_LIST_SIZE];
+	}
+
+	TokenList(int size)
+	{
+		pTokenList = new Token[size];
+	}
+
+	~TokenList()
+	{
+		delete[] pTokenList;
+	}
+
+	Token& operator[](int index)
+	{
+		if (index < 0 && index >= size_)
+			throw std::invalid_argument("Invalid index");
+
+		return pTokenList[index];
+	}
+
+	void addToken(Token token) 
+	{
+		pTokenList[size_] = token;
+		size_ += 1;
+	}
+
+	inline Token& back()
+	{
+		return pTokenList[size_ - 1];
+	}
+
+	inline unsigned int size()
+	{
+		return size_;
+	}
+
+	inline void clear()
+	{
+		size_ = 0;
+	}
+
+private:
+	Token*			pTokenList;
+	unsigned int	size_ = 0;
+};

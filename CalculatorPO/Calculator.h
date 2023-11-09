@@ -2,12 +2,14 @@
 
 #include <iostream>
 #include <string>
+#include "Token.h"
 
 class Calculator
 {
 private:
 	std::string consoleExpression = "";
 	bool		active = true;
+	TokenList	tokenList;
 public:
 	Calculator()
 	{
