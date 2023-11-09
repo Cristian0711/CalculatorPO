@@ -17,10 +17,10 @@ void Calculator::solveSequence(int lIndex, int rIndex)
 void Calculator::solveCalculation(int index)
 {
 	auto& token         = tokenList[index];
-	auto leftNumber     = std::stod(tokenList[index - 1].string());
-	auto rightNumber    = std::stod(tokenList[index + 1].string());
+	auto leftNumber     = tokenList[index - 1].toDouble();
+	auto rightNumber    = tokenList[index + 1].toDouble();
 
-    auto result = 0.f;
+    long double result = 0;
 
     switch (token.string()[0]) {
     default:
@@ -165,12 +165,15 @@ void Calculator::solveExpression()
 		solveSequence(0, tokenList.size());
 	}
 
+	std::cout << tokenList[0].normalize();
+
 	tokenList.clear();
 }
 
 void Calculator::run()
 {
 	std::getline(std::cin, consoleExpression);
+	//consoleExpression = "((40+(5-1*2))*2 / 2 + 2 ^ 3)*2 * (4 + 3 - 6 / 3 * 2)";
 	getTokens();
 	solveExpression();
 }

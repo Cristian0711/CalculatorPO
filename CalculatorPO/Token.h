@@ -60,6 +60,29 @@ public:
 		return string_;
 	}
 
+	const std::string& normalize()
+	{
+		for (auto i = string_.size() - 1; i >= 0; i--)
+		{
+			if (string_[i] == '0' || string_[i] == '.')
+			{
+				string_.erase(i, 1);
+			}
+			else
+			{
+				break;
+			}
+		}
+		return string_;
+	}
+
+	long double toDouble()
+	{
+		if(type_ != Type::Number)
+			throw std::invalid_argument("TOKEN: This token is not a number!");
+		std::stod(string_);
+	}
+
 private:
 	Type		type_;
 	int			priority_;

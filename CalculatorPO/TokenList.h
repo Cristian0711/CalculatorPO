@@ -54,7 +54,7 @@ public:
 	int		getMaxPriority(int lIndex, int rIndex);
 	bool	existsParentheses();
 	void	remove(int index, int size);
-
+	
 private:
 	Token* pTokenList;
 	unsigned int	size_ = 0;
