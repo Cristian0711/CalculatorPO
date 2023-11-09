@@ -16,52 +16,52 @@ void Calculator::solveSequence(int lIndex, int rIndex)
 
 void Calculator::solveCalculation(int index)
 {
-	auto& token         = tokenList[index];
-	auto leftNumber     = tokenList[index - 1].toDouble();
-	auto rightNumber    = tokenList[index + 1].toDouble();
+	auto& token = tokenList[index];
+	auto leftNumber = tokenList[index - 1].toDouble();
+	auto rightNumber = tokenList[index + 1].toDouble();
 
-    long double result = 0;
+	long double result = 0;
 
-    switch (token.string()[0]) {
-    default:
-        throw std::invalid_argument("Operator error");
-        return;
-    case '^':
-        result = pow(leftNumber, rightNumber);
-        break;
+	switch (token.string()[0]) {
+	default:
+		throw std::invalid_argument("CALCULATOR: The given operator is invalid!");
+		return;
+	case '^':
+		result = pow(leftNumber, rightNumber);
+		break;
 	case '#':
 		result = pow(leftNumber, 1.0 / rightNumber);
 		break;
-    case '*':
-        result = leftNumber * rightNumber;
-        break;
-    case '/':
-		if(rightNumber == 0)
-			throw std::invalid_argument("Can not divide by 0");
-        result = leftNumber / rightNumber;
-        break;
-    case '+':
-        result = leftNumber + rightNumber;
-        break;
-    case '-':
-        result = leftNumber - rightNumber;
-        break;
-    }
+	case '*':
+		result = leftNumber * rightNumber;
+		break;
+	case '/':
+		if (rightNumber == 0)
+			throw std::invalid_argument("CALCULATOR: Cannot divide by 0!");
+		result = leftNumber / rightNumber;
+		break;
+	case '+':
+		result = leftNumber + rightNumber;
+		break;
+	case '-':
+		result = leftNumber - rightNumber;
+		break;
+	}
 
-    tokenList[index - 1] = { Token::Type::Number, std::to_string(result) };
+	tokenList[index - 1] = { Token::Type::Number, std::to_string(result) };
 
-    tokenList.remove(index, 2);
+	tokenList.remove(index, 2);
 
-    for (auto i = 0; i < tokenList.size(); i++)
-    {
-        std::cout << tokenList[i].string();
-    }
-    std::cout << '\n';
+	for (auto i = 0; i < tokenList.size(); i++)
+	{
+		std::cout << tokenList[i].string();
+	}
+	std::cout << '\n';
 }
 
 void Calculator::getTokens()
 {
-	for (auto i = 0; i < consoleExpression.size(); i++)
+	for (auto i = 0; i < strlen(consoleExpression); i++)
 	{
 		const auto c = consoleExpression[i];
 		if (isdigit(c))
@@ -77,50 +77,46 @@ void Calculator::getTokens()
 		}
 		else
 		{
-			auto type		= Token::Type::Undefined;
-			auto priority	= -1;
-			auto sign		= false;
-			auto right		= false;
+			auto type = Token::Type::Undefined;
+			auto priority = -1;
 
 			switch (c)
 			{
-			case '(':   
-				type = Token::Type::LeftParenthesis;     
+			case '(':
+				type = Token::Type::LeftParenthesis;
 				break;
 
-			case ')':   
-				type = Token::Type::RightParenthesis;    
+			case ')':
+				type = Token::Type::RightParenthesis;
 				break;
-			case '^':   
-				type = Token::Type::Operator;      
+			case '^':
+				type = Token::Type::Operator;
 				priority = 4;
-				right = true;  
 				break;
 			case '#':
 				type = Token::Type::Operator;
 				priority = 4;
-				right = true;
 				break;
-			case '*':   
-				type = Token::Type::Operator;      
+			case '*':
+				type = Token::Type::Operator;
 				priority = 3;
 				break;
-			case '/':   
-				type = Token::Type::Operator;      
+			case '/':
+				type = Token::Type::Operator;
 				priority = 3;
 				break;
-			case '+':   
-				type = Token::Type::Operator;      
+			case '+':
+				type = Token::Type::Operator;
 				priority = 2;
 				break;
-            case '-':
-                type = Token::Type::Operator;
-                priority = 2;
-                break;
+			case '-':
+				type = Token::Type::Operator;
+				priority = 2;
+				break;
 			}
 
-			if(type != Token::Type::Undefined)
-				tokenList.addToken({ type, std::string(1, c), priority, sign, right});
+			if (type != Token::Type::Undefined)
+				tokenList.addToken({ type, std::string(1, c), priority });
 		}
 	}
 }
@@ -165,14 +161,14 @@ void Calculator::solveExpression()
 		solveSequence(0, tokenList.size());
 	}
 
-	std::cout << tokenList[0].normalize();
+	std::cout << "Answer: " << tokenList[0].normalize() << '\n';
 
 	tokenList.clear();
 }
 
 void Calculator::run()
 {
-	std::getline(std::cin, consoleExpression);
+	gets_s(consoleExpression, consoleSize_);
 	//consoleExpression = "((40+(5-1*2))*2 / 2 + 2 ^ 3)*2 * (4 + 3 - 6 / 3 * 2)";
 	getTokens();
 	solveExpression();

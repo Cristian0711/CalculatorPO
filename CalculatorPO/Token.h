@@ -2,8 +2,6 @@
 
 #include <string>
 
-#define DEFAULT_LIST_SIZE 50
-
 class Token
 {
 public:
@@ -15,24 +13,22 @@ public:
 		RightParenthesis
 	};
 
-	Token() : type_(Type::Undefined), string_(""), priority_(0), sign_(false), right_(false)
+	Token() : type_(Type::Undefined), string_(""), priority_(0)
 	{
 
 	}
 
-	Token(Type type, const std::string& string, int priority = -1, bool sign = false, bool right = false)
-		: type_(type), string_(string), priority_(priority), sign_(sign), right_(false)
+	Token(Type type, const std::string& string, int priority = -1)
+		: type_(type), string_(string), priority_(priority)
 	{
 
 	}
 
-	void operator=(const Token &token)
+	void operator=(const Token& token)
 	{
 		type_ = token.type_;
 		string_ = token.string_;
 		priority_ = token.priority_;
-		sign_ = token.sign_;
-		right_ = token.right_;
 	}
 
 	inline Type type()
@@ -45,48 +41,42 @@ public:
 		return priority_;
 	}
 
-	inline bool sign()
-	{
-		return sign_;
-	}
-
-	inline bool right()
-	{
-		return right_;
-	}
-
 	inline const std::string& string()
 	{
 		return string_;
 	}
 
+	// Remove the 0's after the decimal point and the decimal point if needed
 	const std::string& normalize()
 	{
+		// It doesn't need to be normalized
+		if (string_.find('.') == std::string::npos)
+			return string_;
+
 		for (auto i = string_.size() - 1; i >= 0; i--)
 		{
-			if (string_[i] == '0' || string_[i] == '.')
+			if (string_[i] == '0')
+				string_.erase(i, 1);
+			else if(string_[i] == '.')
 			{
 				string_.erase(i, 1);
-			}
-			else
-			{
 				break;
 			}
+			else
+				break;
 		}
 		return string_;
 	}
 
 	long double toDouble()
 	{
-		if(type_ != Type::Number)
+		if (type_ != Type::Number)
 			throw std::invalid_argument("TOKEN: This token is not a number!");
-		std::stod(string_);
+		return std::stod(string_);
 	}
 
 private:
 	Type		type_;
 	int			priority_;
-	bool		sign_;
-	bool		right_;
 	std::string string_;
 };

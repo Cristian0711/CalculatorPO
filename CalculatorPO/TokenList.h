@@ -24,7 +24,7 @@ public:
 	Token& operator[](int index)
 	{
 		if (index < 0 && index >= size_)
-			throw std::invalid_argument("Invalid index");
+			throw std::invalid_argument("TOKENLIST: The given index is invalid!");
 
 		return pTokenList[index];
 	}
@@ -50,12 +50,12 @@ public:
 		size_ = 0;
 	}
 
-	int		getMaxPriority();
-	int		getMaxPriority(int lIndex, int rIndex);
 	bool	existsParentheses();
 	void	remove(int index, int size);
-	
+	int		getMaxPriority(int lIndex, int rIndex);
+
 private:
-	Token* pTokenList;
+	Token*			pTokenList;
 	unsigned int	size_ = 0;
+	const int		DEFAULT_LIST_SIZE = 50;
 };
