@@ -20,6 +20,7 @@ public:
 
 	void run();
 	void getTokens();
+	void solveSequence(int lIndex, int rIndex);
 
 	inline bool isActive()
 	{

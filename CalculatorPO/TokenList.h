@@ -50,9 +50,11 @@ public:
 		size_ = 0;
 	}
 
-	int getMaxPriority();
-	bool existsParentheses();
-	void solve(int index);
+	int		getMaxPriority();
+	int		getMaxPriority(int lIndex, int rIndex);
+	bool	existsParentheses();
+	void	solveCalculation(int index);
+	void	remove(int index, int size);
 
 private:
 	Token* pTokenList;

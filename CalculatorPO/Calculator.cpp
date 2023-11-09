@@ -74,6 +74,14 @@ void Calculator::getTokens()
 			auto& token = tokenList[i];
 			if (token.type() == Token::Type::LeftParenthesis)
 			{
+				// Verify if the parenthesis was solved
+				if (tokenList[i + 2].type() == Token::Type::RightParenthesis)
+				{
+					tokenList.remove(i + 2, 1);
+					tokenList.remove(i, 1);
+					break;
+				}
+
 				leftParenthesis = i;
 				continue;
 			}
@@ -84,34 +92,26 @@ void Calculator::getTokens()
 			}
 		}
 
-		for (auto i = leftParenthesis + 1; i < rightParenthesis; i++)
+		for (auto j = leftParenthesis + 1; j < rightParenthesis; j++)
 		{
-			auto& token = tokenList[i];
-			std::cout << token.string() << '\n';
-		}
-
-		break;
-
-		/*auto maxPriority = tokenList.maxPriority();
-		for (auto i = 0; i < tokenList.size(); i++)
-		{
-			auto& token = tokenList[i];
-			if (token.type() != Token::Type::Operator)
-				continue;
-
-			if (token.priority() == maxPriority)
+			auto& token = tokenList[j];
+			// Search for operator that has the biggest priority in that parenthesis
+			if (token.type() == Token::Type::Operator && token.priority() == tokenList.getMaxPriority(leftParenthesis, rightParenthesis))
 			{
-				auto& left = tokenList[i - 1];
-				auto& right = tokenList[i + 1];
+				tokenList.solveCalculation(j);
+				break;
 			}
-		}*/
+		}
 	}
 
+	tokenList.solveCalculation(1);
 	tokenList.clear();
 }
 
 void Calculator::run()
 {
 	std::getline(std::cin, consoleExpression);
+	consoleExpression = "((1+2+3)+2+(1+2+3+4))+6";
 	getTokens();
+	tokenList.clear();
 }
