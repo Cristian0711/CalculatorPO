@@ -9,9 +9,19 @@ private:
 	std::string consoleExpression = "";
 	bool		active = true;
 public:
-	Calculator();
+	Calculator()
+	{
+		system("title Proiect Calculator PO");
+	}
 
-	void		run();
+	Calculator(const std::string& consoleTitle)
+	{
+		const std::string title = "title " + consoleTitle;
+		system(title.c_str());
+	}
+
+	void run();
+	void getExpressions();
 
 	inline bool isActive()
 	{

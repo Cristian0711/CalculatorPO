@@ -1,14 +1,23 @@
 #include "Calculator.h"
+#include "Token.h"
 
-Calculator::Calculator()
+void Calculator::getExpressions()
 {
+    for (int i = 0; i < (signed)consoleExpression.length(); ++i) {
+        //The order of the following checks matters
+        if (consoleExpression[i] == '(') {
+            
+        }
+        else if (consoleExpression[i] == ')') {
+            
+        }
+    }
 
+    Token(Token::Type::Number)
 }
 
 void Calculator::run()
 {
-	std::string line;
-	std::getline(std::cin, line);
-
-	std::cout << line << '\n';
+	std::getline(std::cin, consoleExpression);
+	getExpressions();
 }
