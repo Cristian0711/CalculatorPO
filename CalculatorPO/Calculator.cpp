@@ -1,6 +1,6 @@
 #include "Calculator.h"
 
-void Calculator::getExpressions()
+void Calculator::getTokens()
 {
 	for (auto i = 0; i < consoleExpression.size(); i++)
 	{
@@ -54,10 +54,57 @@ void Calculator::getExpressions()
 				type = Token::Type::Operator;      
 				priority = 2;
 				break;
+            case '-':
+                type = Token::Type::Operator;
+                priority = 2;
+                break;
 			}
 
-			tokenList.addToken({ type, std::string(1, c), priority, sign, right});
+			if(type != Token::Type::Undefined)
+				tokenList.addToken({ type, std::string(1, c), priority, sign, right});
 		}
+	}
+
+	while (tokenList.existsParentheses())
+	{
+		auto leftParenthesis = -1;
+		auto rightParenthesis = -1;
+		for (auto i = 0; i < tokenList.size(); i++)
+		{
+			auto& token = tokenList[i];
+			if (token.type() == Token::Type::LeftParenthesis)
+			{
+				leftParenthesis = i;
+				continue;
+			}
+			if (token.type() == Token::Type::RightParenthesis)
+			{
+				rightParenthesis = i;
+				break;
+			}
+		}
+
+		for (auto i = leftParenthesis + 1; i < rightParenthesis; i++)
+		{
+			auto& token = tokenList[i];
+			std::cout << token.string() << '\n';
+		}
+
+		break;
+
+		/*auto maxPriority = tokenList.maxPriority();
+		for (auto i = 0; i < tokenList.size(); i++)
+		{
+			auto& token = tokenList[i];
+			if (token.type() != Token::Type::Operator)
+				continue;
+
+			if (token.priority() == maxPriority)
+			{
+				auto& left = tokenList[i - 1];
+				auto& right = tokenList[i + 1];
+			}
+		}*/
 	}
 
 	tokenList.clear();
@@ -66,5 +113,5 @@ void Calculator::getExpressions()
 void Calculator::run()
 {
 	std::getline(std::cin, consoleExpression);
-	getExpressions();
+	getTokens();
 }

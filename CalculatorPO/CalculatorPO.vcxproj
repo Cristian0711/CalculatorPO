@@ -129,10 +129,12 @@
   <ItemGroup>
     <ClCompile Include="Calculator.cpp" />
     <ClCompile Include="CalculatorPO.cpp" />
+    <ClCompile Include="TokenList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Calculator.h" />
     <ClInclude Include="Token.h" />
+    <ClInclude Include="TokenList.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

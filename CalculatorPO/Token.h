@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #define DEFAULT_LIST_SIZE 50
 
 class Token
@@ -13,39 +15,44 @@ public:
 		RightParenthesis
 	};
 
-	Token() : type(Type::Undefined), priority(0), sign(false)
+	Token() : type_(Type::Undefined), string_(""), priority_(0), sign_(false), right_(false)
 	{
 
 	}
 
 	Token(Type type, const std::string& string, int priority = -1, bool sign = false, bool right = false)
-		: type(type), string_(string), priority(priority), sign(sign), right(false)
+		: type_(type), string_(string), priority_(priority), sign_(sign), right_(false)
 	{
 
 	}
 
 	void operator=(const Token &token)
 	{
-		type = token.type;
+		type_ = token.type_;
 		string_ = token.string_;
-		priority = token.priority;
-		sign = token.sign;
-		right = token.right;
+		priority_ = token.priority_;
+		sign_ = token.sign_;
+		right_ = token.right_;
 	}
 
-	inline Type getType()
+	inline Type type()
 	{
-		return type;
+		return type_;
 	}
 
-	inline int getPriority()
+	inline int priority()
 	{
-		return priority;
+		return priority_;
 	}
 
-	inline bool isSign()
+	inline bool sign()
 	{
-		return sign;
+		return sign_;
+	}
+
+	inline bool right()
+	{
+		return right_;
 	}
 
 	inline const std::string& string()
@@ -54,61 +61,9 @@ public:
 	}
 
 private:
-	Type		type;
-	int			priority;
-	bool		sign;
-	bool		right;
+	Type		type_;
+	int			priority_;
+	bool		sign_;
+	bool		right_;
 	std::string string_;
-};
-
-class TokenList
-{
-public:
-	TokenList()
-	{
-		pTokenList = new Token[DEFAULT_LIST_SIZE];
-	}
-
-	TokenList(int size)
-	{
-		pTokenList = new Token[size];
-	}
-
-	~TokenList()
-	{
-		delete[] pTokenList;
-	}
-
-	Token& operator[](int index)
-	{
-		if (index < 0 && index >= size_)
-			throw std::invalid_argument("Invalid index");
-
-		return pTokenList[index];
-	}
-
-	void addToken(Token token) 
-	{
-		pTokenList[size_] = token;
-		size_ += 1;
-	}
-
-	inline Token& back()
-	{
-		return pTokenList[size_ - 1];
-	}
-
-	inline unsigned int size()
-	{
-		return size_;
-	}
-
-	inline void clear()
-	{
-		size_ = 0;
-	}
-
-private:
-	Token*			pTokenList;
-	unsigned int	size_ = 0;
 };
