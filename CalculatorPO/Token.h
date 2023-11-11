@@ -31,6 +31,8 @@ public:
 		priority_ = token.priority_;
 	}
 
+	friend std::ostream& operator<<(std::ostream& os, const Token& token);
+
 	inline Type type()
 	{
 		return type_;
@@ -71,7 +73,10 @@ public:
 	long double toDouble()
 	{
 		if (type_ != Type::Number)
+		{
+			std::cout << (int)type_ << '\n';
 			throw std::invalid_argument("TOKEN: This token is not a number!");
+		}
 		return std::stod(string_);
 	}
 
@@ -80,3 +85,9 @@ private:
 	int			priority_;
 	std::string string_;
 };
+
+static std::ostream& operator<<(std::ostream& os, const Token& token)
+{
+	os << token.string_;
+	return os;
+}

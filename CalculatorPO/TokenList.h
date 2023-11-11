@@ -29,15 +29,16 @@ public:
 		return pTokenList[index];
 	}
 
-	void addToken(Token token)
-	{
+	void operator+=(const Token& token) {
+
 		pTokenList[size_] = token;
 		size_ += 1;
 	}
 
-	inline Token& back()
+	void addToken(Token token)
 	{
-		return pTokenList[size_ - 1];
+		pTokenList[size_] = token;
+		size_ += 1;
 	}
 
 	inline unsigned int size()

@@ -29,6 +29,10 @@ public:
 	void solveSequence(int lIndex, int rIndex);
 	void solveCalculation(int index);
 	void solveExpression();
+	void verifyExpression();
+
+	static bool validParenthesis(TokenList& tokenList);
+	static bool validOperators(TokenList& tokenList);
 
 	inline bool isActive()
 	{
