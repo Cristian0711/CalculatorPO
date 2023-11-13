@@ -2,24 +2,59 @@
 
 bool TokenList::existsParentheses()
 {
-	for (auto i = 0; i < size_; i++)
+	for (auto i = 0; i < size_; ++i)
 		if (pTokenList[i].type() == Token::Type::LeftParenthesis
 			|| pTokenList[i].type() == Token::Type::RightParenthesis)
 			return true;
 	return false;
 }
 
-void TokenList::remove(int index, int size)
+bool TokenList::existsOperators(size_t lIndex, size_t rIndex)
+{
+	for (auto i = lIndex; i < rIndex; ++i)
+		if (pTokenList[i].type() == Token::Type::Operator)
+			return true;
+	return false;
+}
+
+void TokenList::remove(size_t index, size_t size)
 {
 	memmove(&pTokenList[index], &pTokenList[index + size], (size_ - size) * sizeof(Token));
 	size_ -= size;
 }
 
-int TokenList::getMaxPriority(int lIndex, int rIndex)
+size_t TokenList::getMaxPriority(size_t lIndex, size_t rIndex)
 {
-	auto maxPriority = -1;
-	for (auto i = lIndex + 1; i < rIndex; i++)
-		if (pTokenList[i].priority() > maxPriority)
-			maxPriority = pTokenList[i].priority();
+	size_t maxPriority = 0;
+	for (auto i = lIndex + 1; i < rIndex; ++i)
+	{
+		const auto& token = pTokenList[i];
+		if (token.type() != Token::Type::Operator)
+			continue;
+
+		if (token.priority() > maxPriority)
+			maxPriority = token.priority();
+	}
 	return maxPriority;
+}
+
+size_t TokenList::getPriorityOperator(size_t lIndex, size_t rIndex)
+{
+	size_t index = 0;
+	const auto maxPriority = getMaxPriority(lIndex, rIndex);
+	for (auto i = lIndex + 1; i < rIndex; ++i)
+	{
+		const auto& token = pTokenList[i];
+
+		if (token.type() != Token::Type::Operator)
+			continue;
+
+		// Search for operator that has the biggest priority in that parenthesis
+		if (token.priority() != maxPriority)
+			continue;
+
+		index = i;
+		break;
+	}
+	return index;
 }

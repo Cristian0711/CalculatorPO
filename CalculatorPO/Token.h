@@ -18,7 +18,7 @@ public:
 
 	}
 
-	Token(Type type, const std::string& string, int priority = -1)
+	Token(Type type, const std::string& string, int priority = 0)
 		: type_(type), string_(string), priority_(priority)
 	{
 
@@ -33,57 +33,56 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& os, const Token& token);
 
-	inline Type type()
+	inline Type type() const
 	{
 		return type_;
 	}
 
-	inline int priority()
+	inline size_t priority() const
 	{
 		return priority_;
 	}
 
-	inline const std::string& string()
+	inline const std::string& string() const
 	{
 		return string_;
 	}
 
 	// Remove the 0's after the decimal point and the decimal point if needed
-	const std::string& normalize()
+	inline const std::string normalize() const
 	{
+		std::string buffer = string_;
 		// It doesn't need to be normalized
-		if (string_.find('.') == std::string::npos)
-			return string_;
+		if (buffer.find('.') == std::string::npos)
+			return buffer;
 
-		for (auto i = string_.size() - 1; i >= 0; i--)
+		for (auto i = buffer.size() - 1; i >= 0; --i)
 		{
-			if (string_[i] == '0')
-				string_.erase(i, 1);
-			else if(string_[i] == '.')
+			if (buffer[i] == '0')
+				buffer.erase(i, 1);
+			else if(buffer[i] == '.')
 			{
-				string_.erase(i, 1);
+				buffer.erase(i, 1);
 				break;
 			}
 			else
 				break;
 		}
-		return string_;
+		return buffer;
 	}
 
-	long double toDouble()
+	inline long double toDouble() const
 	{
 		if (type_ != Type::Number)
-		{
-			std::cout << (int)type_ << '\n';
 			throw std::invalid_argument("TOKEN: This token is not a number!");
-		}
+
 		return std::stod(string_);
 	}
 
 private:
 	Type		type_;
-	int			priority_;
-	std::string string_;
+	size_t		priority_;
+	std::string	string_;
 };
 
 static std::ostream& operator<<(std::ostream& os, const Token& token)

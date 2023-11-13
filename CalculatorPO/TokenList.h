@@ -8,7 +8,7 @@ class TokenList
 public:
 	TokenList()
 	{
-		pTokenList = new Token[DEFAULT_LIST_SIZE];
+		pTokenList = new Token[DEFAULT_ARRAY_SIZE];
 	}
 
 	TokenList(int size)
@@ -41,7 +41,7 @@ public:
 		size_ += 1;
 	}
 
-	inline unsigned int size()
+	inline size_t size()
 	{
 		return size_;
 	}
@@ -52,11 +52,13 @@ public:
 	}
 
 	bool	existsParentheses();
-	void	remove(int index, int size);
-	int		getMaxPriority(int lIndex, int rIndex);
+	void	remove(size_t index, size_t size);
+	bool	existsOperators(size_t lIndex, size_t rIndex);
+	size_t	getMaxPriority(size_t lIndex, size_t rIndex);
+	size_t	getPriorityOperator(size_t lIndex, size_t rIndex);
 
 private:
-	Token*			pTokenList;
-	unsigned int	size_ = 0;
-	const int		DEFAULT_LIST_SIZE = 50;
+	Token*		pTokenList;
+	size_t		size_ = 0;
+	const int	DEFAULT_ARRAY_SIZE = 150;
 };

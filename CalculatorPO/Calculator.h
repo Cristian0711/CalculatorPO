@@ -7,7 +7,7 @@
 class Calculator
 {
 public:
-	Calculator(int consoleSize = 100)
+	Calculator(int consoleSize = 150)
 	{
 		consoleExpression = new char[consoleSize];
 		consoleSize_ = consoleSize;
@@ -15,7 +15,7 @@ public:
 		system("title Proiect Calculator PO");
 	}
 
-	Calculator(const std::string& consoleTitle, int consoleSize = 100)
+	Calculator(const std::string& consoleTitle, int consoleSize = 150)
 	{
 		consoleExpression = new char[consoleSize];
 		consoleSize_ = consoleSize;
@@ -26,13 +26,13 @@ public:
 
 	void run();
 	void getTokens();
-	void solveSequence(int lIndex, int rIndex);
-	void solveCalculation(int index);
+	void solveSequence(size_t lIndex, size_t rIndex);
+	void solveCalculation(size_t index);
 	void solveExpression();
 	void verifyExpression();
 
 	static bool validParenthesis(TokenList& tokenList);
-	static bool validOperators(TokenList& tokenList);
+	static bool validTokens(TokenList& tokenList);
 
 	inline bool isActive()
 	{
@@ -41,7 +41,7 @@ public:
 
 private:
 	char*		consoleExpression = nullptr;
-	int			consoleSize_ = 100;
+	size_t		consoleSize_ = 150;
 	bool		active = true;
 	TokenList	tokenList;
 };

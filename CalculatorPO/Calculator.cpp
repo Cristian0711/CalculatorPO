@@ -3,9 +3,9 @@
 bool Calculator::validParenthesis(TokenList& tokenList)
 {
 	std::string stack = "";
-	for (auto i = 0; i < tokenList.size(); i++)
+	for (auto i = 0; i < tokenList.size(); ++i)
 	{
-		auto& token = tokenList[i];
+		const auto& token = tokenList[i];
 		if (token.type() == Token::Type::LeftParenthesis)
 		{
 			stack += token.string();
@@ -25,19 +25,19 @@ bool Calculator::validParenthesis(TokenList& tokenList)
 	return stack.empty() ? true : false;
 }
 
-bool Calculator::validOperators(TokenList& tokenList)
+bool Calculator::validTokens(TokenList& tokenList)
 {
-	for (auto i = 0; i < tokenList.size(); i++)
+	for (auto i = 0; i < tokenList.size(); ++i)
 	{
-		auto& token = tokenList[i];
+		const auto& token = tokenList[i];
 		if (token.type() == Token::Type::Operator)
 		{
-			// First token cannot be an operator
-			if (i == 0)
+			// First and last tokens cannot be operators
+			if (i == 0 || i == tokenList.size() - 1)
 				return false;
 
 			// The prev token must be a number or right parenthesis
-			auto& prevToken = tokenList[i - 1];
+			const auto& prevToken = tokenList[i - 1];
 			if (prevToken.type() != Token::Type::Number &&
 				prevToken.type() != Token::Type::RightParenthesis)
 				return false;
@@ -49,90 +49,41 @@ bool Calculator::validOperators(TokenList& tokenList)
 				continue;
 
 			// The next token must be an operator or right paranthesis
-			auto& nextToken = tokenList[i + 1];
+			const auto& nextToken = tokenList[i + 1];
 			if (nextToken.type() != Token::Type::Operator &&
 				nextToken.type() != Token::Type::RightParenthesis)
+				return false;
+		}
+
+		if (token.type() == Token::Type::LeftParenthesis)
+		{
+			// Last token cannot be an left parenthesis
+			if (i == tokenList.size() - 1)
+				return false;
+
+			// The next token must be a number
+			const auto& nextToken = tokenList[i + 1];
+			if (nextToken.type() != Token::Type::Number && 
+				nextToken.type() != Token::Type::LeftParenthesis)
 				return false;
 		}
 	}
 	return true;
 }
 
-void Calculator::solveSequence(int lIndex, int rIndex)
-{
-	for (auto i = lIndex + 1; i < rIndex; i++)
-	{
-		auto& token = tokenList[i];
-
-		if (token.type() != Token::Type::Operator)
-			continue;
-
-		// Search for operator that has the biggest priority in that parenthesis
-		if (token.priority() != tokenList.getMaxPriority(lIndex, rIndex))
-			continue;
-
-		solveCalculation(i);
-		break;
-	}
-}
-
-void Calculator::solveCalculation(int index)
-{
-	auto& token = tokenList[index];
-	auto leftNumber = tokenList[index - 1].toDouble();
-	auto rightNumber = tokenList[index + 1].toDouble();
-
-	long double result = 0;
-
-	switch (token.string().at(0)) {
-	default:
-		throw std::invalid_argument("CALCULATOR: The given operator is invalid!");
-	case '^':
-		result = pow(leftNumber, rightNumber);
-		break;
-	case '#':
-		result = pow(leftNumber, 1.0 / rightNumber);
-		break;
-	case '*':
-		result = leftNumber * rightNumber;
-		break;
-	case '/':
-		if (rightNumber == 0)
-			throw std::invalid_argument("CALCULATOR: Cannot divide by 0!");
-		result = leftNumber / rightNumber;
-		break;
-	case '+':
-		result = leftNumber + rightNumber;
-		break;
-	case '-':
-		result = leftNumber - rightNumber;
-		break;
-	}
-
-	tokenList[index - 1] = { Token::Type::Number, std::to_string(result) };
-
-	tokenList.remove(index, 2);
-
-	for (auto i = 0; i < tokenList.size(); i++)
-	{
-		std::cout << tokenList[i];
-	}
-	std::cout << '\n';
-}
-
 void Calculator::getTokens()
 {
-	if(strlen(consoleExpression) == 0)
+	if (strlen(consoleExpression) == 0)
 		throw std::invalid_argument("CALCULATOR: No input given!");
 
-	for (auto i = 0; i < strlen(consoleExpression); i++)
+	for (auto i = 0; i < strlen(consoleExpression); ++i)
 	{
 		const auto c = consoleExpression[i];
 		if (isdigit(c))
 		{
 			const auto startIndex = i;
 			while (isdigit(consoleExpression[i]) || consoleExpression[i] == '.')
-				i++;
+				++i;
 
 			const auto number = std::string(consoleExpression, startIndex, i - startIndex);
 			tokenList += { Token::Type::Number, number };
@@ -142,7 +93,7 @@ void Calculator::getTokens()
 		else
 		{
 			auto type = Token::Type::Undefined;
-			auto priority = -1;
+			auto priority = 0;
 
 			switch (c)
 			{
@@ -188,28 +139,74 @@ void Calculator::getTokens()
 	}
 }
 
+void Calculator::solveCalculation(size_t index)
+{
+	const auto& token = tokenList[index];
+	auto leftNumber = tokenList[index - 1].toDouble();
+	auto rightNumber = tokenList[index + 1].toDouble();
+
+	long double result = 0;
+
+	switch (token.string().at(0)) {
+	default:
+		throw std::invalid_argument("CALCULATOR: The given operator is invalid!");
+	case '^':
+		result = pow(leftNumber, rightNumber);
+		break;
+	case '#':
+		result = pow(leftNumber, 1.0 / rightNumber);
+		break;
+	case '*':
+		result = leftNumber * rightNumber;
+		break;
+	case '/':
+		if (rightNumber == 0)
+			throw std::invalid_argument("CALCULATOR: Cannot divide by 0!");
+		result = leftNumber / rightNumber;
+		break;
+	case '+':
+		result = leftNumber + rightNumber;
+		break;
+	case '-':
+		result = leftNumber - rightNumber;
+		break;
+	}
+
+	tokenList[index - 1] = { Token::Type::Number, std::to_string(result) };
+	tokenList.remove(index, 2);
+}
+
+void Calculator::solveSequence(size_t lIndex, size_t rIndex)
+{
+	while (tokenList.existsOperators(lIndex, rIndex))
+	{
+		const auto index = tokenList.getPriorityOperator(lIndex, rIndex);
+		solveCalculation(index);
+
+		// Deleted 2 tokens from tokenList
+		rIndex -= 2;
+	}
+
+	// Remove the parenthesis if the sequence was solved and had parenthesis
+	if (tokenList[lIndex].type() == Token::Type::LeftParenthesis && 
+		tokenList[rIndex].type() == Token::Type::RightParenthesis)
+	{
+		tokenList.remove(rIndex, 1);
+		tokenList.remove(lIndex, 1);
+	}
+}
+
 void Calculator::solveExpression()
 {
 	while (tokenList.existsParentheses())
 	{
-		auto leftParenthesis = -1;
-		auto rightParenthesis = -1;
-		for (auto i = 0; i < tokenList.size(); i++)
+		auto leftParenthesis = 0;
+		auto rightParenthesis = 0;
+		for (auto i = 0; i < tokenList.size(); ++i)
 		{
-			auto& token = tokenList[i];
+			const auto& token = tokenList[i];
 			if (token.type() == Token::Type::LeftParenthesis)
 			{
-				// Verify if the parenthesis was solved
-				if (tokenList[i + 2].type() == Token::Type::RightParenthesis)
-				{
-					// Remove second parenthesis
-					tokenList.remove(i + 2, 1);
-
-					// Remove first parenthesis
-					tokenList.remove(i, 1);
-					break;
-				}
-
 				leftParenthesis = i;
 				continue;
 			}
@@ -220,16 +217,10 @@ void Calculator::solveExpression()
 			}
 		}
 
-		if (leftParenthesis != -1 && rightParenthesis != -1)
-		{
-			solveSequence(leftParenthesis, rightParenthesis);
-		}
+		solveSequence(leftParenthesis, rightParenthesis);
 	}
 
-	while (tokenList.size() != 1)
-	{
-		solveSequence(0, tokenList.size());
-	}
+	solveSequence(0, tokenList.size());
 
 	std::cout << "Answer: " << tokenList[0].normalize() << '\n';
 }
@@ -239,7 +230,7 @@ void Calculator::verifyExpression()
 	if (!validParenthesis(tokenList))
 		throw std::invalid_argument("CALCULATOR: Invalid parenthesis!");
 
-	if(!validOperators(tokenList))
+	if(!validTokens(tokenList))
 		throw std::invalid_argument("CALCULATOR: Invalid expression!");
 }
 
