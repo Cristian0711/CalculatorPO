@@ -26,6 +26,7 @@ public:
 
 	void run();
 	void getTokens();
+	void replaceParenthesis();
 	void solveSequence(size_t lIndex, size_t rIndex);
 	void solveCalculation(size_t index);
 	void solveExpression();

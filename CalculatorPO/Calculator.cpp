@@ -43,18 +43,6 @@ bool Calculator::validTokens(const TokenList& tokenList)
 				return false;
 		}
 
-		if (token.type() == Token::Type::Number)
-		{
-			if (i == tokenList.size() - 1)
-				continue;
-
-			// The next token must be an operator or right paranthesis
-			const auto& nextToken = tokenList[i + 1];
-			if (nextToken.type() != Token::Type::Operator &&
-				nextToken.type() != Token::Type::RightParenthesis)
-				return false;
-		}
-
 		if (token.type() == Token::Type::LeftParenthesis)
 		{
 			// Last token cannot be an left parenthesis
@@ -65,6 +53,18 @@ bool Calculator::validTokens(const TokenList& tokenList)
 			const auto& nextToken = tokenList[i + 1];
 			if (nextToken.type() != Token::Type::Number && 
 				nextToken.type() != Token::Type::LeftParenthesis)
+				return false;
+		}
+
+		if (token.type() == Token::Type::Number)
+		{
+			if (i == tokenList.size() - 1)
+				continue;
+
+			// The next token must be an operator or right paranthesis
+			const auto& nextToken = tokenList[i + 1];
+			if (nextToken.type() != Token::Type::Operator &&
+				nextToken.type() != Token::Type::RightParenthesis)
 				return false;
 		}
 	}
@@ -141,9 +141,9 @@ void Calculator::getTokens()
 
 void Calculator::solveCalculation(size_t index)
 {
-	const auto& token = tokenList[index];
-	auto leftNumber = tokenList[index - 1].toDouble();
-	auto rightNumber = tokenList[index + 1].toDouble();
+	const auto& token	= tokenList[index];
+	auto leftNumber		= tokenList[index - 1].toDouble();
+	auto rightNumber	= tokenList[index + 1].toDouble();
 
 	long double result = 0;
 
@@ -234,9 +234,22 @@ void Calculator::verifyExpression()
 		throw std::invalid_argument("CALCULATOR: Invalid expression!");
 }
 
+void Calculator::replaceParenthesis()
+{
+	for (auto i = 0; i < strlen(consoleExpression); i++)
+	{
+		auto& chr = consoleExpression[i];
+		if (chr == '[' || chr == '{')
+			chr = '(';
+		if (chr == ']' || chr == '}')
+			chr = ')';
+	}
+}
+
 void Calculator::run()
 {
 	gets_s(consoleExpression, consoleSize_);
+	replaceParenthesis();
 
 	try
 	{
