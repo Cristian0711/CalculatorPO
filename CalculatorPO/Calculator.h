@@ -31,8 +31,8 @@ public:
 	void solveExpression();
 	void verifyExpression();
 
-	static bool validParenthesis(TokenList& tokenList);
-	static bool validTokens(TokenList& tokenList);
+	static bool validParenthesis(const TokenList& tokenList);
+	static bool validTokens(const TokenList& tokenList);
 
 	inline bool isActive()
 	{

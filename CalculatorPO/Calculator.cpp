@@ -1,6 +1,6 @@
 #include "Calculator.h"
 
-bool Calculator::validParenthesis(TokenList& tokenList)
+bool Calculator::validParenthesis(const TokenList& tokenList)
 {
 	std::string stack = "";
 	for (auto i = 0; i < tokenList.size(); ++i)
@@ -25,7 +25,7 @@ bool Calculator::validParenthesis(TokenList& tokenList)
 	return stack.empty() ? true : false;
 }
 
-bool Calculator::validTokens(TokenList& tokenList)
+bool Calculator::validTokens(const TokenList& tokenList)
 {
 	for (auto i = 0; i < tokenList.size(); ++i)
 	{

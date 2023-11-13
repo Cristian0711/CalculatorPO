@@ -21,7 +21,7 @@ public:
 		delete[] pTokenList;
 	}
 
-	Token& operator[](int index)
+	Token& operator[](int index) const
 	{
 		if (index < 0 && index >= size_)
 			throw std::invalid_argument("TOKENLIST: The given index is invalid!");
@@ -41,7 +41,7 @@ public:
 		size_ += 1;
 	}
 
-	inline size_t size()
+	inline size_t size() const
 	{
 		return size_;
 	}
