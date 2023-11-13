@@ -56,18 +56,9 @@ public:
 		if (buffer.find('.') == std::string::npos)
 			return buffer;
 
-		for (auto i = buffer.size() - 1; i >= 0; --i)
-		{
-			if (buffer[i] == '0')
-				buffer.erase(i, 1);
-			else if(buffer[i] == '.')
-			{
-				buffer.erase(i, 1);
-				break;
-			}
-			else
-				break;
-		}
+		while (!buffer.empty() && buffer.back() == '0' || buffer.back() == '.')
+			buffer.pop_back();
+
 		return buffer;
 	}
 
