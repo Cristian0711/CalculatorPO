@@ -19,8 +19,14 @@ bool TokenList::existsOperators(size_t lIndex, size_t rIndex)
 
 void TokenList::remove(size_t index, size_t size)
 {
-	memmove(&pTokenList[index], &pTokenList[index + size], (size_ - size) * sizeof(Token));
-	size_ -= size;
+	/*memmove(&pTokenList[index], &pTokenList[index + size], (size_ - size) * sizeof(Token));*/
+	while (size)
+	{
+		for (int i = index; i < size_ - 1; ++i)
+			pTokenList[i] = pTokenList[i + 1];
+		size_ -= 1;
+		size -= 1;
+	}
 }
 
 size_t TokenList::getMaxPriority(size_t lIndex, size_t rIndex)

@@ -18,6 +18,7 @@ public:
 
 	~TokenList()
 	{
+		std::cout << "destructor\n";
 		delete[] pTokenList;
 	}
 

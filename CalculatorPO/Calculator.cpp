@@ -249,6 +249,13 @@ void Calculator::replaceParenthesis()
 void Calculator::run()
 {
 	gets_s(consoleExpression, consoleSize_);
+
+	if (strcmp(consoleExpression, "exit") == 0)
+	{
+		active = false;
+		return;
+	}
+
 	replaceParenthesis();
 
 	try
