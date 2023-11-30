@@ -3,9 +3,9 @@
 bool Calculator::validParenthesis(const TokenList& tokenList)
 {
 	std::string stack = "";
-	for (auto i = 0; i < tokenList.size(); ++i)
+	for (int i = 0; i < tokenList.size(); ++i)
 	{
-		const auto& token = tokenList[i];
+		const Token& token = tokenList[i];
 		if (token.type() == Token::Type::LeftParenthesis)
 		{
 			stack += token.string();
@@ -27,9 +27,9 @@ bool Calculator::validParenthesis(const TokenList& tokenList)
 
 bool Calculator::validTokens(const TokenList& tokenList)
 {
-	for (auto i = 0; i < tokenList.size(); ++i)
+	for (int i = 0; i < tokenList.size(); ++i)
 	{
-		const auto& token = tokenList[i];
+		const Token& token = tokenList[i];
 		if (token.type() == Token::Type::Operator)
 		{
 			// First and last tokens cannot be operators
@@ -37,7 +37,7 @@ bool Calculator::validTokens(const TokenList& tokenList)
 				return false;
 
 			// The prev token must be a number or right parenthesis
-			const auto& prevToken = tokenList[i - 1];
+			const Token& prevToken = tokenList[i - 1];
 			if (prevToken.type() != Token::Type::Number &&
 				prevToken.type() != Token::Type::RightParenthesis)
 				return false;
@@ -50,7 +50,7 @@ bool Calculator::validTokens(const TokenList& tokenList)
 				return false;
 
 			// The next token must be a number
-			const auto& nextToken = tokenList[i + 1];
+			const Token& nextToken = tokenList[i + 1];
 			if (nextToken.type() != Token::Type::Number && 
 				nextToken.type() != Token::Type::LeftParenthesis)
 				return false;
@@ -62,7 +62,7 @@ bool Calculator::validTokens(const TokenList& tokenList)
 				continue;
 
 			// The next token must be an operator or right paranthesis
-			const auto& nextToken = tokenList[i + 1];
+			const Token& nextToken = tokenList[i + 1];
 			if (nextToken.type() != Token::Type::Operator &&
 				nextToken.type() != Token::Type::RightParenthesis)
 				return false;
@@ -76,24 +76,24 @@ void Calculator::getTokens()
 	if (strlen(consoleExpression) == 0)
 		throw std::invalid_argument("CALCULATOR: No input given!");
 
-	for (auto i = 0; i < strlen(consoleExpression); ++i)
+	for (int i = 0; i < strlen(consoleExpression); ++i)
 	{
-		const auto c = consoleExpression[i];
+		const char& c = consoleExpression[i];
 		if (isdigit(c))
 		{
-			const auto startIndex = i;
+			const size_t startIndex = i;
 			while (isdigit(consoleExpression[i]) || consoleExpression[i] == '.')
 				++i;
 
-			const auto number = std::string(consoleExpression, startIndex, i - startIndex);
+			const std::string number = std::string(consoleExpression, startIndex, i - startIndex);
 			tokenList += { Token::Type::Number, number };
 
 			i -= 1;
 		}
 		else
 		{
-			auto type = Token::Type::Undefined;
-			auto priority = 0;
+			Token::Type type = Token::Type::Undefined;
+			unsigned int priority = 0;
 
 			switch (c)
 			{
@@ -141,38 +141,44 @@ void Calculator::getTokens()
 
 void Calculator::solveCalculation(size_t index)
 {
-	const auto& token	= tokenList[index];
-	auto leftNumber		= tokenList[index - 1].toDouble();
-	auto rightNumber	= tokenList[index + 1].toDouble();
+	const Token& token			= tokenList[index];
+	const Token& leftToken		= tokenList[index - 1];
+	const Token& rightToken		= tokenList[index + 1];
 
-	long double result = 0;
+	Token result;
 
 	switch (token.string().at(0)) {
 	default:
 		throw std::invalid_argument("CALCULATOR: The given operator is invalid!");
 	case '^':
-		result = pow(leftNumber, rightNumber);
+		result = pow(leftToken, rightToken);
 		break;
 	case '#':
-		result = pow(leftNumber, 1.0 / rightNumber);
+		result = pow(leftToken, 1.0 / rightToken);
 		break;
 	case '*':
-		result = leftNumber * rightNumber;
+		result = leftToken * rightToken;
 		break;
 	case '/':
-		if (rightNumber == 0)
+		if (rightToken == 0)
 			throw std::invalid_argument("CALCULATOR: Cannot divide by 0!");
-		result = leftNumber / rightNumber;
+		result = leftToken / rightToken;
 		break;
 	case '+':
-		result = leftNumber + rightNumber;
+		result = leftToken + rightToken;
 		break;
 	case '-':
-		result = leftNumber - rightNumber;
+		result = leftToken - rightToken;
 		break;
 	}
 
-	tokenList[index - 1] = { Token::Type::Number, std::to_string(result) };
+	for (int i = 0; i < tokenList.size(); i++)
+	{
+		std::cout << tokenList[i];
+	}
+	std::cout << '\n';
+
+	tokenList[index - 1] = result;
 	tokenList.remove(index, 2);
 }
 
@@ -180,7 +186,7 @@ void Calculator::solveSequence(size_t lIndex, size_t rIndex)
 {
 	while (tokenList.existsOperators(lIndex, rIndex))
 	{
-		const auto index = tokenList.getPriorityOperator(lIndex, rIndex);
+		const size_t index = tokenList.getPriorityOperator(lIndex, rIndex);
 		solveCalculation(index);
 
 		// Deleted 2 tokens from tokenList
@@ -200,11 +206,11 @@ void Calculator::solveExpression()
 {
 	while (tokenList.existsParentheses())
 	{
-		auto leftParenthesis = 0;
-		auto rightParenthesis = 0;
-		for (auto i = 0; i < tokenList.size(); ++i)
+		unsigned int leftParenthesis = 0;
+		unsigned int rightParenthesis = 0;
+		for (int i = 0; i < tokenList.size(); ++i)
 		{
-			const auto& token = tokenList[i];
+			const Token& token = tokenList[i];
 			if (token.type() == Token::Type::LeftParenthesis)
 			{
 				leftParenthesis = i;
@@ -222,7 +228,7 @@ void Calculator::solveExpression()
 
 	solveSequence(0, tokenList.size());
 
-	std::cout << "Answer: " << tokenList[0].normalize() << '\n';
+	std::cout << "Answer: " << tokenList[0] << '\n';
 }
 
 void Calculator::verifyExpression()
@@ -236,9 +242,9 @@ void Calculator::verifyExpression()
 
 void Calculator::replaceParenthesis()
 {
-	for (auto i = 0; i < strlen(consoleExpression); i++)
+	for (int i = 0; i < strlen(consoleExpression); ++i)
 	{
-		auto& chr = consoleExpression[i];
+		char& chr = consoleExpression[i];
 		if (chr == '[' || chr == '{')
 			chr = '(';
 		if (chr == ']' || chr == '}')
@@ -248,7 +254,13 @@ void Calculator::replaceParenthesis()
 
 void Calculator::run()
 {
-	gets_s(consoleExpression, consoleSize_);
+	std::cin.getline(consoleExpression, consoleSize_);
+	if (std::cin.fail())
+	{
+		std::cin.clear();
+		std::cin.ignore(LLONG_MAX, '\n');
+		throw std::invalid_argument("CALCULATOR: The sequence is bigger than 150 characters!");
+	}
 
 	if (strcmp(consoleExpression, "exit") == 0)
 	{

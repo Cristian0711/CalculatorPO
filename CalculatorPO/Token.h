@@ -18,20 +18,23 @@ public:
 
 	}
 
-	Token(Type type, const std::string& string, int priority = 0)
+	Token(const Token& token) 
+		: type_(token.type_), string_(token.string_), priority_(token.priority_)
+	{
+
+	}
+
+	Token(Type type, const long double number, unsigned int priority = 0)
+		: type_(type), string_(std::to_string(number)), priority_(priority)
+	{
+
+	}
+
+	Token(Type type, const std::string& string, unsigned int priority = 0)
 		: type_(type), string_(string), priority_(priority)
 	{
 
 	}
-
-	void operator=(const Token& token)
-	{
-		type_ = token.type_;
-		string_ = token.string_;
-		priority_ = token.priority_;
-	}
-
-	friend std::ostream& operator<<(std::ostream& os, const Token& token);
 
 	inline Type type() const
 	{
@@ -70,14 +73,64 @@ public:
 		return std::stod(string_);
 	}
 
+
+	Token& operator=(const Token& token)
+	{
+		type_ = token.type_;
+		string_ = token.string_;
+		priority_ = token.priority_;
+
+		return *this;
+	}
+
+	Token& operator=(const double number)
+	{
+		type_ = Type::Number;
+		string_ = std::to_string(number);
+		priority_ = 0;
+
+		return *this;
+	}
+
+	operator double() const
+	{
+		return toDouble();
+	}
+
+	friend Token operator+(const Token& firstToken, const Token& secondToken);
+	friend Token operator-(const Token& firstToken, const Token& secondToken);
+	friend Token operator*(const Token& firstToken, const Token& secondToken);
+	friend Token operator/(const Token& firstToken, const Token& secondToken);
+	friend std::ostream& operator<<(std::ostream& os, const Token& token);
+
 private:
 	Type		type_;
 	size_t		priority_;
 	std::string	string_;
 };
 
+static Token operator+(const Token& firstToken, const Token& secondToken)
+{
+	return { Token::Type::Number, firstToken.toDouble() + secondToken.toDouble() };
+}
+
+static Token operator-(const Token& firstToken, const Token& secondToken)
+{
+	return { Token::Type::Number, firstToken.toDouble() - secondToken.toDouble() };
+}
+
+static Token operator*(const Token& firstToken, const Token& secondToken)
+{
+	return { Token::Type::Number, firstToken.toDouble() * secondToken.toDouble() };
+}
+
+static Token operator/(const Token& firstToken, const Token& secondToken)
+{
+	return { Token::Type::Number, firstToken.toDouble() / secondToken.toDouble() };
+}
+
 static std::ostream& operator<<(std::ostream& os, const Token& token)
 {
-	os << token.string_;
+	os << token.normalize();
 	return os;
 }
