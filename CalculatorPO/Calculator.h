@@ -3,37 +3,32 @@
 #include <iostream>
 #include <string>
 #include "TokenList.h"
+#include "Parser.h"
 
 class Calculator
 {
 public:
-	Calculator(int consoleSize = 150)
+	Calculator(bool debug = false) 
+		: debug(debug)
 	{
-		consoleExpression = new char[consoleSize];
-		consoleSize_ = consoleSize;
+		consoleExpression = new char[150];
+		consoleSize = 150;
 
 		system("title Proiect Calculator PO");
 	}
 
-	Calculator(const std::string& consoleTitle, int consoleSize = 150)
+	Calculator(int consoleSize, bool debug = false)
+		: consoleSize(consoleSize), debug(debug)
 	{
 		consoleExpression = new char[consoleSize];
-		consoleSize_ = consoleSize;
 
-		const std::string title = "title " + consoleTitle;
-		system(title.c_str());
+		system("title Proiect Calculator PO");
 	}
 
 	void run();
-	void getTokens();
-	void replaceParenthesis();
 	void solveSequence(size_t lIndex, size_t rIndex);
 	void solveCalculation(size_t index);
-	void solveExpression();
-	void verifyExpression();
-
-	static bool validParenthesis(const TokenList& tokenList);
-	static bool validTokens(const TokenList& tokenList);
+	double solveExpression();
 
 	inline bool isActive()
 	{
@@ -42,7 +37,8 @@ public:
 
 private:
 	char*		consoleExpression = nullptr;
-	size_t		consoleSize_ = 150;
+	size_t		consoleSize = 150;
 	bool		active = true;
+	bool		debug = false;
 	TokenList	tokenList;
 };

@@ -2,6 +2,8 @@
 
 #include <string>
 
+#define TOKEN_MAX_PRIORITY 4
+
 class Token
 {
 public:
@@ -67,8 +69,8 @@ public:
 
 	inline long double toDouble() const
 	{
-		if (type_ != Type::Number)
-			throw std::invalid_argument("TOKEN: This token is not a number!");
+		//if (type_ != Type::Number)
+		//	throw std::invalid_argument("TOKEN: This token is not a number!");
 
 		return std::stod(string_);
 	}

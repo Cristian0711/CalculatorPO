@@ -55,7 +55,6 @@ public:
 	bool	existsParentheses();
 	void	remove(size_t index, size_t size);
 	bool	existsOperators(size_t lIndex, size_t rIndex);
-	size_t	getMaxPriority(size_t lIndex, size_t rIndex);
 	size_t	getPriorityOperator(size_t lIndex, size_t rIndex);
 
 private:
