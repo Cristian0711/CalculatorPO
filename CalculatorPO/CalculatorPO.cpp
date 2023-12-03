@@ -13,7 +13,7 @@ int main()
         {
             calculator.run();
         }
-        catch (const std::invalid_argument& exception)
+        catch (const std::exception& exception)
         {
             std::cout << exception.what() << '\n';
         }

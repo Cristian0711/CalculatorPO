@@ -1,6 +1,6 @@
 #include "Calculator.h"
 
-void Calculator::solveCalculation(size_t index)
+Token Calculator::solveCalculation(size_t index)
 {
 	const Token& token			= tokenList[index];
 	const Token& leftToken		= tokenList[index - 1];
@@ -10,7 +10,7 @@ void Calculator::solveCalculation(size_t index)
 
 	switch (token.string().at(0)) {
 	default:
-		throw std::invalid_argument("CALCULATOR: The given operator is invalid!");
+		throw std::exception("CALCULATOR: The given operator is invalid!");
 	case '^':
 		result = pow(leftToken, rightToken);
 		break;
@@ -22,7 +22,7 @@ void Calculator::solveCalculation(size_t index)
 		break;
 	case '/':
 		if (rightToken == 0)
-			throw std::invalid_argument("CALCULATOR: Cannot divide by 0!");
+			throw std::exception("CALCULATOR: Cannot divide by 0!");
 		result = leftToken / rightToken;
 		break;
 	case '+':
@@ -42,8 +42,7 @@ void Calculator::solveCalculation(size_t index)
 		std::cout << '\n';
 	}
 
-	tokenList[index - 1] = result;
-	tokenList.remove(index, 2);
+	return result;
 }
 
 void Calculator::solveSequence(size_t lIndex, size_t rIndex)
@@ -51,8 +50,11 @@ void Calculator::solveSequence(size_t lIndex, size_t rIndex)
 	while (tokenList.existsOperators(lIndex, rIndex))
 	{
 		const size_t index = tokenList.getPriorityOperator(lIndex, rIndex);
-		solveCalculation(index);
+		const Token  result = solveCalculation(index);
 
+		tokenList[index - 1] = result;
+		tokenList.remove(index, 2);
+		
 		// Deleted 2 tokens from tokenList
 		rIndex -= 2;
 	}
@@ -66,7 +68,7 @@ void Calculator::solveSequence(size_t lIndex, size_t rIndex)
 	}
 }
 
-double Calculator::solveExpression()
+long double Calculator::solveExpression()
 {
 	while (tokenList.existsParentheses())
 	{
@@ -101,7 +103,7 @@ void Calculator::run()
 	{
 		std::cin.clear();
 		std::cin.ignore(LLONG_MAX, '\n');
-		throw std::invalid_argument("CALCULATOR: The sequence is bigger than 150 characters!");
+		throw std::exception("CALCULATOR: The sequence is bigger than 150 characters!");
 	}
 
 	if (strcmp(consoleExpression, "exit") == 0)
@@ -117,7 +119,7 @@ void Calculator::run()
 
 		std::cout << "Answer: " << solveExpression() << '\n';
 	}
-	catch (const std::invalid_argument& exception)
+	catch (const std::exception& exception)
 	{
 		std::cout << exception.what() << '\n';
 	}

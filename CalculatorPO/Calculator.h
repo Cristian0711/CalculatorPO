@@ -17,7 +17,7 @@ public:
 		system("title Proiect Calculator PO");
 	}
 
-	Calculator(int consoleSize, bool debug = false)
+	Calculator(size_t consoleSize, bool debug = false)
 		: consoleSize(consoleSize), debug(debug)
 	{
 		consoleExpression = new char[consoleSize];
@@ -25,10 +25,10 @@ public:
 		system("title Proiect Calculator PO");
 	}
 
-	void run();
-	void solveSequence(size_t lIndex, size_t rIndex);
-	void solveCalculation(size_t index);
-	double solveExpression();
+	void		run();
+	void		solveSequence(size_t lIndex, size_t rIndex);
+	Token		solveCalculation(size_t index);
+	long double solveExpression();
 
 	inline bool isActive()
 	{

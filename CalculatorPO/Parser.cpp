@@ -77,7 +77,7 @@ bool Parser::validTokens(const TokenList& tokenList)
 void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpression)
 {
 	if (consoleExpression.length() == 0)
-		throw std::invalid_argument("CALCULATOR: No input given!");
+		throw std::exception("CALCULATOR: No input given!");
 
 	for (int i = 0; i < consoleExpression.length(); ++i)
 	{
@@ -101,7 +101,7 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 			switch (c)
 			{
 			default:
-				throw std::invalid_argument("CALCULATOR: Invalid expression was given!");
+				throw std::exception("CALCULATOR: Invalid expression was given!");
 			case ' ':
 				continue;
 			case '(':
@@ -154,8 +154,8 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 	}
 
 	if (!validParenthesis(tokenList))
-		throw std::invalid_argument("CALCULATOR: Invalid parenthesis!");
+		throw std::exception("CALCULATOR: Invalid parenthesis!");
 
 	if (!validTokens(tokenList))
-		throw std::invalid_argument("CALCULATOR: Invalid expression!");
+		throw std::exception("CALCULATOR: Invalid expression!");
 }

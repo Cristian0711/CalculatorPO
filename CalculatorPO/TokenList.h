@@ -3,34 +3,40 @@
 #include <iostream>
 #include "Token.h"
 
+#define DEFAULT_ARRAY_SIZE 50
+
 class TokenList
 {
 public:
-	TokenList()
+	TokenList() 
+		: allocated_size(DEFAULT_ARRAY_SIZE)
 	{
 		pTokenList = new Token[DEFAULT_ARRAY_SIZE];
 	}
 
-	TokenList(int size)
+	TokenList(size_t size) 
+		: allocated_size(size)
 	{
 		pTokenList = new Token[size];
 	}
 
 	~TokenList()
 	{
-		std::cout << "destructor\n";
 		delete[] pTokenList;
 	}
 
-	Token& operator[](int index) const
+	Token& operator[](size_t index) const
 	{
 		if (index < 0 && index >= size_)
-			throw std::invalid_argument("TOKENLIST: The given index is invalid!");
+			throw std::exception("TOKENLIST: The given index is invalid!");
 
 		return pTokenList[index];
 	}
 
-	void operator+=(const Token& token) {
+	void operator+=(const Token& token) 
+	{
+		if (size_ >= allocated_size)
+			throw std::exception("TOKENLIST: There are not enough allocated tokens!");
 
 		pTokenList[size_] = token;
 		size_ += 1;
@@ -38,6 +44,9 @@ public:
 
 	void addToken(Token token)
 	{
+		if(size_ >= allocated_size)
+			throw std::exception("TOKENLIST: There are not enough allocated tokens!");
+
 		pTokenList[size_] = token;
 		size_ += 1;
 	}
@@ -58,7 +67,7 @@ public:
 	size_t	getPriorityOperator(size_t lIndex, size_t rIndex);
 
 private:
-	Token*		pTokenList;
-	size_t		size_ = 0;
-	const int	DEFAULT_ARRAY_SIZE = 150;
+	Token*			pTokenList;
+	size_t			size_ = 0;
+	const size_t    allocated_size;
 };

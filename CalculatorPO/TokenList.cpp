@@ -2,7 +2,7 @@
 
 bool TokenList::existsParentheses()
 {
-	for (int i = 0; i < size_; ++i)
+	for (size_t i = 0; i < size_; ++i)
 		if (pTokenList[i].type() == Token::Type::LeftParenthesis
 			|| pTokenList[i].type() == Token::Type::RightParenthesis)
 			return true;
@@ -11,7 +11,7 @@ bool TokenList::existsParentheses()
 
 bool TokenList::existsOperators(size_t lIndex, size_t rIndex)
 {
-	for (int i = lIndex; i < rIndex; ++i)
+	for (size_t i = lIndex; i < rIndex; ++i)
 		if (pTokenList[i].type() == Token::Type::Operator)
 			return true;
 	return false;
@@ -22,7 +22,7 @@ void TokenList::remove(size_t index, size_t size)
 	/*memmove(&pTokenList[index], &pTokenList[index + size], (size_ - size) * sizeof(Token));*/
 	while (size)
 	{
-		for (int i = index; i < size_ - 1; ++i)
+		for (size_t i = index; i < size_ - 1; ++i)
 			pTokenList[i] = pTokenList[i + 1];
 		size_ -= 1;
 		size -= 1;
@@ -33,7 +33,7 @@ size_t TokenList::getPriorityOperator(size_t lIndex, size_t rIndex)
 {
 	size_t index = 0;
 	size_t maxPriority = 0;
-	for (int i = lIndex + 1; i < rIndex; ++i)
+	for (size_t i = lIndex + 1; i < rIndex; ++i)
 	{
 		const Token& token = pTokenList[i];
 

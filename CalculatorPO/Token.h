@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <stdexcept>
 
 #define TOKEN_MAX_PRIORITY 4
 
@@ -26,8 +27,8 @@ public:
 
 	}
 
-	Token(Type type, const long double number, unsigned int priority = 0)
-		: type_(type), string_(std::to_string(number)), priority_(priority)
+	Token(Type type, const long double number)
+		: type_(type), string_(std::to_string(number)), priority_(0)
 	{
 
 	}
@@ -69,8 +70,8 @@ public:
 
 	inline long double toDouble() const
 	{
-		//if (type_ != Type::Number)
-		//	throw std::invalid_argument("TOKEN: This token is not a number!");
+		if (type_ != Type::Number)
+			throw std::exception("TOKEN: This token is not a number!");
 
 		return std::stod(string_);
 	}
@@ -85,7 +86,7 @@ public:
 		return *this;
 	}
 
-	Token& operator=(const double number)
+	Token& operator=(const long double number)
 	{
 		type_ = Type::Number;
 		string_ = std::to_string(number);
@@ -94,7 +95,7 @@ public:
 		return *this;
 	}
 
-	operator double() const
+	operator long double() const
 	{
 		return toDouble();
 	}
@@ -123,7 +124,7 @@ static Token operator-(const Token& firstToken, const Token& secondToken)
 
 static Token operator*(const Token& firstToken, const Token& secondToken)
 {
-	return { Token::Type::Number, firstToken.toDouble() * secondToken.toDouble() };
+	return { Token::Type::Number, firstToken.toDouble() * secondToken.toDouble()};
 }
 
 static Token operator/(const Token& firstToken, const Token& secondToken)
