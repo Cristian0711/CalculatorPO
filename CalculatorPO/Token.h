@@ -62,7 +62,10 @@ public:
 		if (buffer.find('.') == std::string::npos)
 			return buffer;
 
-		while (!buffer.empty() && buffer.back() == '0' || buffer.back() == '.')
+		while (!buffer.empty() && buffer.back() == '0')
+			buffer.pop_back();
+
+		if (buffer.back() == '.')
 			buffer.pop_back();
 
 		return buffer;

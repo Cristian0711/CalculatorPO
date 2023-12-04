@@ -51,9 +51,19 @@ public:
 		size_ += 1;
 	}
 
+	inline Token& back() const
+	{
+		return pTokenList[size_ - 1];
+	}
+
 	inline size_t size() const
 	{
 		return size_;
+	}
+
+	bool empty()
+	{
+		return size_ != 0 ? false : true;
 	}
 
 	inline void clear()

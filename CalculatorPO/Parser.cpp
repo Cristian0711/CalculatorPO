@@ -25,7 +25,7 @@ bool Parser::validParenthesis(const TokenList& tokenList)
 		}
 	}
 
-	return stack.empty() ? true : false;
+	return stack.empty();
 }
 
 bool Parser::validTokens(const TokenList& tokenList)
@@ -79,18 +79,20 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 	if (consoleExpression.length() == 0)
 		throw std::exception("CALCULATOR: No input given!");
 
+	static bool hasSign = false;
 	for (int i = 0; i < consoleExpression.length(); ++i)
 	{
 		const char& c = consoleExpression[i];
 		if (isdigit(c))
 		{
-			const size_t startIndex = i;
+			const size_t startIndex = hasSign ? i - 1 : i;
 			while (isdigit(consoleExpression[i]) || consoleExpression[i] == '.')
 				++i;
 
 			const std::string number = std::string(consoleExpression, startIndex, i - startIndex);
 			tokenList += { Token::Type::Number, number };
 
+			hasSign = false;
 			i -= 1;
 		}
 		else
@@ -148,8 +150,22 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 				break;
 			}
 
-			if (type != Token::Type::Undefined)
-				tokenList += { type, std::string(1, c), priority };
+			// Do not add the '-' to the token list if it's a negative number '-30'
+			if (tokenList.empty() && (c == '-' || c == '+'))
+			{
+				hasSign = true;
+				continue;
+			}
+
+			// Used to work with '(-30)'
+			if (!tokenList.empty() && 
+				tokenList.back().type() == Token::Type::LeftParenthesis && (c == '-' || c == '+'))
+			{
+				hasSign = true;
+				continue;
+			}
+
+			tokenList += { type, std::string(1, c), priority };
 		}
 	}
 
