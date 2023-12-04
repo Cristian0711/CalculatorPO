@@ -85,6 +85,7 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 		const char& c = consoleExpression[i];
 		if (isdigit(c))
 		{
+			// If it has a sign the start index must be modified
 			const size_t startIndex = hasSign ? i - 1 : i;
 			while (isdigit(consoleExpression[i]) || consoleExpression[i] == '.')
 				++i;

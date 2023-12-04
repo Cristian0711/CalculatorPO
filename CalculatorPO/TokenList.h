@@ -61,7 +61,7 @@ public:
 		return size_;
 	}
 
-	bool empty()
+	bool empty() const
 	{
 		return size_ != 0 ? false : true;
 	}
