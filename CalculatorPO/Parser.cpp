@@ -30,6 +30,9 @@ bool Parser::validParenthesis(const TokenList& tokenList)
 
 bool Parser::validTokens(const TokenList& tokenList)
 {
+	if (tokenList.size() == 0)
+		return false;
+
 	for (int i = 0; i < tokenList.size(); ++i)
 	{
 		const Token& token = tokenList[i];
@@ -79,21 +82,21 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 	if (consoleExpression.length() == 0)
 		throw std::exception("CALCULATOR: No input given!");
 
-	static bool hasSign = false;
+	bool hasUnary = false;
 	for (int i = 0; i < consoleExpression.length(); ++i)
 	{
 		const char& c = consoleExpression[i];
 		if (isdigit(c))
 		{
 			// If it has a sign the start index must be modified
-			const size_t startIndex = hasSign ? i - 1 : i;
-			while (isdigit(consoleExpression[i]) || consoleExpression[i] == '.')
+			const size_t startIndex = hasUnary ? i - 1 : i;
+			while (i < consoleExpression.length() && isdigit(consoleExpression[i]) || consoleExpression[i] == '.')
 				++i;
 
 			const std::string number = std::string(consoleExpression, startIndex, i - startIndex);
 			tokenList += { Token::Type::Number, number };
 
-			hasSign = false;
+			hasUnary = false;
 			i -= 1;
 		}
 		else
@@ -154,7 +157,7 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 			// Do not add the '-' to the token list if it's a negative number '-30'
 			if (tokenList.empty() && (c == '-' || c == '+'))
 			{
-				hasSign = true;
+				hasUnary = true;
 				continue;
 			}
 
@@ -162,7 +165,7 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 			if (!tokenList.empty() && 
 				tokenList.back().type() == Token::Type::LeftParenthesis && (c == '-' || c == '+'))
 			{
-				hasSign = true;
+				hasUnary = true;
 				continue;
 			}
 

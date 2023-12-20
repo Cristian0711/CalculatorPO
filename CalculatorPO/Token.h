@@ -76,7 +76,7 @@ public:
 		if (type_ != Type::Number)
 			throw std::exception("TOKEN: This token is not a number!");
 
-		return std::stod(string_);
+		return std::stold(string_);
 	}
 
 

@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Token.h"
 
-#define DEFAULT_ARRAY_SIZE 50
+#define DEFAULT_ARRAY_SIZE 300
 
 class TokenList
 {
@@ -76,8 +76,17 @@ public:
 	bool	existsOperators(size_t lIndex, size_t rIndex);
 	size_t	getPriorityOperator(size_t lIndex, size_t rIndex);
 
+	friend std::ostream& operator<<(std::ostream& os, const TokenList& tokenList);
+
 private:
 	Token*			pTokenList;
 	size_t			size_ = 0;
 	const size_t    allocated_size;
 };
+
+static std::ostream& operator<<(std::ostream& os, const TokenList& tokenList)
+{
+	for(int i = 0; i < tokenList.size_; i++)
+		os << tokenList[i];
+	return os;
+}

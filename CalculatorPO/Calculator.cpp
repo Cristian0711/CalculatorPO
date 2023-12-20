@@ -34,13 +34,7 @@ Token Calculator::solveCalculation(size_t index)
 	}
 
 	if (debug == true)
-	{
-		for (int i = 0; i < tokenList.size(); i++)
-		{
-			std::cout << tokenList[i];
-		}
-		std::cout << '\n';
-	}
+		std::cout << tokenList << '\n';
 
 	return result;
 }
@@ -68,7 +62,7 @@ void Calculator::solveSequence(size_t lIndex, size_t rIndex)
 	}
 }
 
-long double Calculator::solveExpression()
+const Token& Calculator::solveExpression()
 {
 	while (tokenList.existsParentheses())
 	{
@@ -103,7 +97,7 @@ void Calculator::run()
 	{
 		std::cin.clear();
 		std::cin.ignore(LLONG_MAX, '\n');
-		throw std::exception("CALCULATOR: The sequence is bigger than 150 characters!");
+		throw std::exception(std::string("CALCULATOR: The sequence is bigger than " + std::to_string(consoleSize) + " characters!" ).c_str());
 	}
 
 	if (strcmp(consoleExpression, "exit") == 0)
