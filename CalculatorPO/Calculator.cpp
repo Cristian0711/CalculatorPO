@@ -1,21 +1,20 @@
 #include "Calculator.h"
 
-Token Calculator::solveCalculation(size_t index)
+Token Calculator::solveCalculation(const Token* token)
 {
-	const Token& token			= tokenList[index];
-	const Token& leftToken		= tokenList[index - 1];
-	const Token& rightToken		= tokenList[index + 1];
+	const Token& leftToken		= *token->prev();
+	const Token& rightToken		= *token->next();
 
 	Token result;
 
-	switch (token.string().at(0)) {
+	switch (token->string().at(0)) {
 	default:
 		throw std::exception("CALCULATOR: The given operator is invalid!");
 	case '^':
 		result = pow(leftToken, rightToken);
 		break;
 	case '#':
-		result = pow(leftToken, 1.0 / rightToken);
+		result = pow((double)leftToken, 1.0 / (double)rightToken);
 		break;
 	case '*':
 		result = leftToken * rightToken;
@@ -39,26 +38,25 @@ Token Calculator::solveCalculation(size_t index)
 	return result;
 }
 
-void Calculator::solveSequence(size_t lIndex, size_t rIndex)
+void Calculator::solveSequence(const Token* lToken, const Token* rToken)
 {
-	while (tokenList.existsOperators(lIndex, rIndex))
+	while (tokenList.existsOperators(lToken, rToken))
 	{
-		const size_t index = tokenList.getPriorityOperator(lIndex, rIndex);
-		const Token  result = solveCalculation(index);
+		const Token* operatorToken = tokenList.getPriorityOperator(lToken, rToken);
+		const Token  result = solveCalculation(operatorToken);
 
-		tokenList[index - 1] = result;
-		tokenList.remove(index, 2);
-		
-		// Deleted 2 tokens from tokenList
-		rIndex -= 2;
+		*operatorToken->prev() = result;
+
+		tokenList.removeToken(operatorToken->next());
+		tokenList.removeToken(operatorToken);
 	}
 
 	// Remove the parenthesis if the sequence was solved and had parenthesis
-	if (tokenList[lIndex].type() == Token::Type::LeftParenthesis && 
-		tokenList[rIndex].type() == Token::Type::RightParenthesis)
+	if (lToken->type() == Token::Type::LeftParenthesis &&
+		rToken->type() == Token::Type::RightParenthesis)
 	{
-		tokenList.remove(rIndex, 1);
-		tokenList.remove(lIndex, 1);
+		tokenList.removeToken(lToken);
+		tokenList.removeToken(rToken);
 	}
 }
 
@@ -66,28 +64,29 @@ const Token& Calculator::solveExpression()
 {
 	while (tokenList.existsParentheses())
 	{
-		unsigned int leftParenthesis = 0;
-		unsigned int rightParenthesis = 0;
-		for (int i = 0; i < tokenList.size(); ++i)
+		Token* leftParenthesis = 0;
+		Token* rightParenthesis = 0;
+
+		Token* token = tokenList.front();
+		while (token != nullptr)
 		{
-			const Token& token = tokenList[i];
-			if (token.type() == Token::Type::LeftParenthesis)
+			if (token->type() == Token::Type::LeftParenthesis)
 			{
-				leftParenthesis = i;
-				continue;
+				leftParenthesis = token;
 			}
-			if (token.type() == Token::Type::RightParenthesis)
+			if (token->type() == Token::Type::RightParenthesis)
 			{
-				rightParenthesis = i;
+				rightParenthesis = token;
 				break;
 			}
+			token = token->next();
 		}
 
 		solveSequence(leftParenthesis, rightParenthesis);
 	}
 
-	solveSequence(0, tokenList.size());
-	return tokenList[0];
+	solveSequence(tokenList.front(), tokenList.back());
+	return *tokenList.front();
 }
 
 void Calculator::run()
@@ -110,6 +109,7 @@ void Calculator::run()
 	{
 		Parser parser;
 		parser.getTokens(tokenList, consoleExpression);
+		//parser.getTokens(tokenList, "(-1+2-3)+4+5*(6+7/8)#9");
 
 		std::cout << "Answer: " << solveExpression() << '\n';
 	}

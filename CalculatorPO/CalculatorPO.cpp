@@ -5,7 +5,6 @@
 
 int main()
 {
-
     Calculator calculator(true);
     while (calculator.isActive())
     {
