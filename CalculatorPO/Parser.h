@@ -19,7 +19,7 @@ public:
 
 	void getTokens(TokenList& tokenList, const std::string& consoleExpression) const;
 
-	static bool validTokens(const TokenList& tokenList);
 	static bool validParenthesis(const TokenList& tokenList);
+	static bool validTokens(const TokenList& tokenList);
 };
 
