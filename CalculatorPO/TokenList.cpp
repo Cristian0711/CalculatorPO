@@ -1,18 +1,5 @@
 #include "TokenList.h"
 
-bool TokenList::existsOperators(const Token* lToken, const Token* rToken) const
-{
-	const Token* token = lToken;
-	while (token != rToken && token != nullptr)
-	{
-		if (token->type() == Token::Type::Operator)
-			return true;
-
-		token = token->next();
-	}
-	return false;
-}
-
 // This function also checks for validity, works with 2 tokens also where third is nullptr
 const Token* TokenList::priorityOperatorOfTokens(const Token* first, const Token* second, const Token* third) const
 {
@@ -20,6 +7,7 @@ const Token* TokenList::priorityOperatorOfTokens(const Token* first, const Token
 		return nullptr;
 
 	const Token* returnOperator = nullptr;
+
 	if (third != nullptr)
 	{
 		if (first->priority() >= second->priority() && first->priority() >= third->priority())

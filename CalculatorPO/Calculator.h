@@ -31,8 +31,8 @@ public:
 	}
 
 	void			run();
-	Token			solveCalculation(const Token* token) const;
-	const Token& solveExpression();
+	Token			solveExpression(const Token* token) const;
+	const Token&	solveExpression();
 
 private:
 	char* consoleExpression = nullptr;

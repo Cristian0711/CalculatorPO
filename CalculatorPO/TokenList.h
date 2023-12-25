@@ -13,9 +13,15 @@ public:
 		clear();
 	}
 
-	void operator+=(const Token& token)
+	inline size_t size() const
 	{
-		addToken(token);
+		return size_;
+	}
+
+
+	inline bool empty() const
+	{
+		return size_ != 0 ? false : true;
 	}
 
 	inline Token* front() const
@@ -28,15 +34,14 @@ public:
 		return tail;
 	}
 
-	inline bool empty() const
+	void operator+=(const Token& token)
 	{
-		return size_ != 0 ? false : true;
+		addToken(token);
 	}
 
 	void	clear();
 	void	addToken(const Token& token);
 	void	removeToken(const Token* token);
-	bool	existsOperators(const Token* lToken, const Token* rToken) const;
 
 	const Token* getPriorityOperator(const Token* tokenOperator) const;
 	const Token* priorityOperatorOfTokens(const Token* first, const Token* second, const Token* third = nullptr) const;

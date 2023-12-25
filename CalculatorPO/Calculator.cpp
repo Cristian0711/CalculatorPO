@@ -1,8 +1,8 @@
 #include "Calculator.h"
 
-Token Calculator::solveCalculation(const Token* token) const
+Token Calculator::solveExpression(const Token* token) const
 {
-	const Token& leftToken = *token->prev();
+	const Token& leftToken	= *token->prev();
 	const Token& rightToken = *token->next();
 
 	Token result;
@@ -37,7 +37,7 @@ Token Calculator::solveCalculation(const Token* token) const
 
 const Token& Calculator::solveExpression()
 {
-	while (tokenList.existsOperators(tokenList.front(), tokenList.back()))
+	while (tokenList.size() != 1)
 	{
 		Token* token = tokenList.front();
 		while (token != nullptr)
@@ -52,7 +52,7 @@ const Token& Calculator::solveExpression()
 					continue;
 				}
 
-				const Token  result = solveCalculation(operatorToken);
+				const Token result = solveExpression(operatorToken);
 
 				// 3+3-3 -> 6+3-3 ->
 				*operatorToken->prev() = result;
