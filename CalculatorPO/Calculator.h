@@ -27,7 +27,6 @@ public:
 
 	void			run();
 	Token			solveCalculation(const Token* token);
-	const Token*	getPriorityOperator(const Token* tokenOperator);
 	const Token&	solveExpression();
 
 	inline bool isActive()

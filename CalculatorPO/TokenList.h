@@ -30,30 +30,18 @@ public:
 		return tail;
 	}
 
-	bool empty() const
+	inline bool empty() const
 	{
 		return size_ != 0 ? false : true;
 	}
 
-	inline void clear()
-	{
-		Token* token = head;
-		while (token != nullptr)
-		{
-			Token* next = token->next();
-			delete token;
-			token = next;
-		}
-		head = nullptr;
-		size_ = 0;
-	}
-
-	bool	existsParentheses();
+	void	clear();
 	void	addToken(const Token& token);
 	void	removeToken(const Token* token);
 	bool	existsOperators(const Token* lToken, const Token* rToken);
 
-	const Token* getPriorityOperator(const Token* lToken, const Token* rToken);
+	const Token* getPriorityOperator(const Token* tokenOperator);
+
 	friend std::ostream& operator<<(std::ostream& os, const TokenList& tokenList);
 private:
 	size_t			size_ = 0;
