@@ -1,21 +1,20 @@
 #include "Calculator.h"
 
-Token Calculator::solveCalculation(size_t index)
+Token Calculator::solveCalculation(const Token* token) const
 {
-	const Token& token			= tokenList[index];
-	const Token& leftToken		= tokenList[index - 1];
-	const Token& rightToken		= tokenList[index + 1];
+	const Token& leftToken = *token->prev();
+	const Token& rightToken = *token->next();
 
 	Token result;
 
-	switch (token.string().at(0)) {
+	switch (token->string().at(0)) {
 	default:
 		throw std::exception("CALCULATOR: The given operator is invalid!");
 	case '^':
 		result = pow(leftToken, rightToken);
 		break;
 	case '#':
-		result = pow(leftToken, 1.0 / rightToken);
+		result = pow((double)leftToken, 1.0 / (double)rightToken);
 		break;
 	case '*':
 		result = leftToken * rightToken;
@@ -33,61 +32,54 @@ Token Calculator::solveCalculation(size_t index)
 		break;
 	}
 
-	if (debug == true)
-		std::cout << tokenList << '\n';
-
 	return result;
-}
-
-void Calculator::solveSequence(size_t lIndex, size_t rIndex)
-{
-	while (tokenList.existsOperators(lIndex, rIndex))
-	{
-		const size_t index = tokenList.getPriorityOperator(lIndex, rIndex);
-		const Token  result = solveCalculation(index);
-
-		tokenList[index - 1] = result;
-		tokenList.remove(index, 2);
-		
-		// Deleted 2 tokens from tokenList
-		rIndex -= 2;
-	}
-
-	// Remove the parenthesis if the sequence was solved and had parenthesis
-	if (tokenList[lIndex].type() == Token::Type::LeftParenthesis && 
-		tokenList[rIndex].type() == Token::Type::RightParenthesis)
-	{
-		tokenList.remove(rIndex, 1);
-		tokenList.remove(lIndex, 1);
-	}
 }
 
 const Token& Calculator::solveExpression()
 {
-	while (tokenList.existsParentheses())
+	while (tokenList.existsOperators(tokenList.front(), tokenList.back()))
 	{
-		unsigned int leftParenthesis = 0;
-		unsigned int rightParenthesis = 0;
-		for (int i = 0; i < tokenList.size(); ++i)
+		Token* token = tokenList.front();
+		while (token != nullptr)
 		{
-			const Token& token = tokenList[i];
-			if (token.type() == Token::Type::LeftParenthesis)
+			if (token->isOperator())
 			{
-				leftParenthesis = i;
-				continue;
-			}
-			if (token.type() == Token::Type::RightParenthesis)
-			{
-				rightParenthesis = i;
-				break;
-			}
-		}
+				const Token* operatorToken = tokenList.getPriorityOperator(token);
 
-		solveSequence(leftParenthesis, rightParenthesis);
+				if (operatorToken == nullptr)
+				{
+					token = token->next();
+					continue;
+				}
+
+				const Token  result = solveCalculation(operatorToken);
+
+				// 3+3-3 -> 6+3-3 ->
+				*operatorToken->prev() = result;
+				token = operatorToken->prev();
+
+				// 6-3
+				tokenList.removeToken(operatorToken->next());
+				tokenList.removeToken(operatorToken);
+
+				if (debug == true)
+					std::cout << tokenList << '\n';
+			}
+
+			// Remove parenthesis 2+(3)+4
+			if (token->prev() != nullptr && token->next() != nullptr &&
+				token->prev()->isLeftParenthesis() &&
+				token->next()->isRightParenthesis())
+			{
+				tokenList.removeToken(token->prev());
+				tokenList.removeToken(token->next());
+			}
+
+			token = token->next();
+		}
 	}
 
-	solveSequence(0, tokenList.size());
-	return tokenList[0];
+	return *tokenList.front();
 }
 
 void Calculator::run()
@@ -97,7 +89,7 @@ void Calculator::run()
 	{
 		std::cin.clear();
 		std::cin.ignore(LLONG_MAX, '\n');
-		throw std::exception(std::string("CALCULATOR: The sequence is bigger than " + std::to_string(consoleSize) + " characters!" ).c_str());
+		throw std::exception(std::string("CALCULATOR: The sequence is bigger than " + std::to_string(consoleSize) + " characters!").c_str());
 	}
 
 	if (strcmp(consoleExpression, "exit") == 0)
@@ -110,6 +102,7 @@ void Calculator::run()
 	{
 		Parser parser;
 		parser.getTokens(tokenList, consoleExpression);
+		//parser.getTokens(tokenList, "(-1+2-3)+4+5*(6+7/8)#9");
 
 		std::cout << "Answer: " << solveExpression() << '\n';
 	}

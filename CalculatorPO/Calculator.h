@@ -10,7 +10,7 @@
 class Calculator
 {
 public:
-	Calculator(bool debug = false) 
+	Calculator(bool debug = false)
 		: debug(debug)
 	{
 		consoleExpression = new char[consoleSize];
@@ -25,18 +25,17 @@ public:
 		system("title Proiect Calculator PO");
 	}
 
-	void			run();
-	void			solveSequence(size_t lIndex, size_t rIndex);
-	Token			solveCalculation(size_t index);
-	const Token& solveExpression();
-
-	inline bool isActive()
+	inline bool isActive() const
 	{
 		return active;
 	}
 
+	void			run();
+	Token			solveCalculation(const Token* token) const;
+	const Token& solveExpression();
+
 private:
-	char*			consoleExpression = nullptr;
+	char* consoleExpression = nullptr;
 	bool			active = true;
 	bool			debug = false;
 	TokenList		tokenList;
