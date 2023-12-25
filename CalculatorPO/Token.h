@@ -92,7 +92,6 @@ public:
 		return false;
 	}
 
-
 	inline Token* next() const
 	{
 		return next_;
@@ -128,26 +127,6 @@ public:
 			buffer.pop_back();
 
 		return buffer;
-	}
-
-	inline Token* next() const
-	{
-		return next_;
-	}
-
-	inline Token* prev() const
-	{
-		return prev_;
-	}
-
-	inline void setNext(Token* token)
-	{
-		next_ = token;
-	}
-
-	inline void setPrev(Token* token)
-	{
-		prev_ = token;
 	}
 
 	Token& operator=(const Token& token)
