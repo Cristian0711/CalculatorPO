@@ -81,6 +81,35 @@ public:
 		return std::stold(string_);
 	}
 
+	inline bool isLeftParenthesis() const
+	{
+		if (type_ == Type::LeftParenthesis)
+			return true;
+		return false;
+	}
+
+	inline bool isRightParenthesis() const
+	{
+		if (type_ == Type::RightParenthesis)
+			return true;
+		return false;
+	}
+
+	inline bool isOperator() const
+	{
+		if (type_ == Type::Operator)
+			return true;
+		return false;
+	}
+
+	inline bool isNumber() const
+	{
+		if (type_ == Type::Number)
+			return true;
+		return false;
+	}
+
+
 	inline Token* next() const
 	{
 		return next_;

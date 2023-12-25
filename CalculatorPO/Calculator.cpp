@@ -38,54 +38,114 @@ Token Calculator::solveCalculation(const Token* token)
 	return result;
 }
 
-void Calculator::solveSequence(const Token* lToken, const Token* rToken)
+const Token* Calculator::getPriorityOperator(const Token* tokenOperator)
 {
-	while (tokenList.existsOperators(lToken, rToken))
+	Token* nextNumber = tokenOperator->next();
+	Token* prevNumber = tokenOperator->prev();
+
+	Token* nextOperator = nextNumber->next();
+	Token* prevOperator = prevNumber->prev();
+
+	if (prevOperator == nullptr && nextOperator == nullptr)
+		return tokenOperator;
+
+	// 2+2*3 if we check this for the addition operator it has no previous operator
+	if (prevOperator == nullptr)
 	{
-		const Token* operatorToken = tokenList.getPriorityOperator(lToken, rToken);
-		const Token  result = solveCalculation(operatorToken);
+		/* Used in case nextOperator is not a number and it's because tokenOperator's next is a paraenthesis
+		  and in this case we need to solve the parenthesis first '2*(3-4)' */
+		if (!nextOperator->isOperator())
+			return nullptr;
 
-		*operatorToken->prev() = result;
+		/* In this case it should not return the multiplication operator 2+2*(3-4) */
+		if (!nextOperator->next()->isNumber())
+			return nullptr;
 
-		tokenList.removeToken(operatorToken->next());
-		tokenList.removeToken(operatorToken);
+		if (tokenOperator->priority() >= nextOperator->priority())
+			return tokenOperator;
+		else
+			return nextOperator;
 	}
 
-	// Remove the parenthesis if the sequence was solved and had parenthesis
-	if (lToken->type() == Token::Type::LeftParenthesis &&
-		rToken->type() == Token::Type::RightParenthesis)
+	// 2+2*3 if we check this for the multiplication operator it has no next operator
+	if (nextOperator == nullptr)
 	{
-		tokenList.removeToken(lToken);
-		tokenList.removeToken(rToken);
+		/* Used in case prevOperator is not a number and it's because tokenOperator's prev is a paraenthesis
+		  and in this case we need to solve the parenthesis first '(3-4)*2'*/
+		if (!prevOperator->isOperator())
+			return nullptr;
+
+		/* In this case it should not return the multiplication operator (3-4)*2+2 */
+		if (!prevOperator->prev()->isNumber())
+			return nullptr;
+
+		if (tokenOperator->priority() >= prevOperator->priority())
+			return tokenOperator;
+		else
+			return prevOperator;
 	}
+
+	// Search for the highest priority between all 3 operators and save it to check if it is valid
+	const Token* returnOperator;
+	if (tokenOperator->priority() >= nextOperator->priority() && tokenOperator->priority() >= prevOperator->priority())
+	{
+		returnOperator = tokenOperator;
+	}
+	else if (nextOperator->priority() >= prevOperator->priority())
+	{
+		returnOperator = nextOperator;
+	}
+	else
+	{
+		returnOperator = prevOperator;
+	}
+
+	// Used to check if the both terms of the operation are numbers else the parenthesis needs to be solved
+	if (!returnOperator->prev()->isNumber() || !returnOperator->next()->isNumber())
+		return nullptr;
+
+	return returnOperator;
 }
 
 const Token& Calculator::solveExpression()
 {
-	while (tokenList.existsParentheses())
+	while (tokenList.existsOperators(tokenList.front(), tokenList.back()))
 	{
-		Token* leftParenthesis = 0;
-		Token* rightParenthesis = 0;
-
 		Token* token = tokenList.front();
 		while (token != nullptr)
 		{
-			if (token->type() == Token::Type::LeftParenthesis)
+			if (token->isOperator())
 			{
-				leftParenthesis = token;
+				const Token* operatorToken = getPriorityOperator(token);
+
+				if (operatorToken == nullptr)
+					goto nextToken;
+
+				const Token  result = solveCalculation(operatorToken);
+
+				// 3+3-3 -> 6+3-3 ->
+				*operatorToken->prev() = result;
+				token = operatorToken->prev();
+
+				// 6-3
+				tokenList.removeToken(operatorToken->next());
+				tokenList.removeToken(operatorToken);
 			}
-			if (token->type() == Token::Type::RightParenthesis)
+
+			// Remove parenthesis 2+(3)+4
+			if (token->prev() != nullptr && token->next() != nullptr &&
+				token->prev()->isLeftParenthesis() &&
+				token->next()->isRightParenthesis())
 			{
-				rightParenthesis = token;
-				break;
+				tokenList.removeToken(token->prev());
+				tokenList.removeToken(token->next());
 			}
+
+			nextToken:
 			token = token->next();
 		}
-
-		solveSequence(leftParenthesis, rightParenthesis);
 	}
 
-	solveSequence(tokenList.front(), tokenList.back());
 	return *tokenList.front();
 }
 
