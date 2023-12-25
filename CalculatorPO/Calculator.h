@@ -5,15 +5,15 @@
 #include "TokenList.h"
 #include "Parser.h"
 
+#define DEFAULT_CONSOLE_SIZE 300
+
 class Calculator
 {
 public:
 	Calculator(bool debug = false) 
 		: debug(debug)
 	{
-		consoleExpression = new char[150];
-		consoleSize = 150;
-
+		consoleExpression = new char[consoleSize];
 		system("title Proiect Calculator PO");
 	}
 
@@ -25,10 +25,9 @@ public:
 		system("title Proiect Calculator PO");
 	}
 
-	void		run();
-	void		solveSequence(size_t lIndex, size_t rIndex);
-	Token		solveCalculation(size_t index);
-	long double solveExpression();
+	void			run();
+	Token			solveCalculation(const Token* token);
+	const Token&	solveExpression();
 
 	inline bool isActive()
 	{
@@ -36,9 +35,9 @@ public:
 	}
 
 private:
-	char*		consoleExpression = nullptr;
-	size_t		consoleSize = 150;
-	bool		active = true;
-	bool		debug = false;
-	TokenList	tokenList;
+	char*			consoleExpression = nullptr;
+	bool			active = true;
+	bool			debug = false;
+	TokenList		tokenList;
+	const size_t	consoleSize = DEFAULT_CONSOLE_SIZE;
 };

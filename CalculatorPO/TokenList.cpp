@@ -1,55 +1,143 @@
 #include "TokenList.h"
 
-bool TokenList::existsParentheses()
+bool TokenList::existsOperators(const Token* lToken, const Token* rToken)
 {
-	for (size_t i = 0; i < size_; ++i)
-		if (pTokenList[i].type() == Token::Type::LeftParenthesis
-			|| pTokenList[i].type() == Token::Type::RightParenthesis)
+	const Token* token = lToken;
+	while (token != rToken && token != nullptr)
+	{
+		if (token->type() == Token::Type::Operator)
 			return true;
+
+		token = token->next();
+	}
 	return false;
 }
 
-bool TokenList::existsOperators(size_t lIndex, size_t rIndex)
+const Token* priorityOperatorOfThree(const Token* first, const Token* second, const Token* third)
 {
-	for (size_t i = lIndex; i < rIndex; ++i)
-		if (pTokenList[i].type() == Token::Type::Operator)
-			return true;
-	return false;
-}
-
-void TokenList::remove(size_t index, size_t size)
-{
-	/*memmove(&pTokenList[index], &pTokenList[index + size], (size_ - size) * sizeof(Token));*/
-	while (size)
+	if (first->priority() >= second->priority() && first->priority() >= third->priority())
 	{
-		for (size_t i = index; i < size_ - 1; ++i)
-			pTokenList[i] = pTokenList[i + 1];
-		size_ -= 1;
-		size -= 1;
+		return first;
+	}
+	else if (second->priority() >= third->priority())
+	{
+		return second;
+	}
+	else
+	{
+		return third;
 	}
 }
 
-size_t TokenList::getPriorityOperator(size_t lIndex, size_t rIndex)
+const Token* TokenList::getPriorityOperator(const Token* tokenOperator)
 {
-	size_t index = 0;
-	size_t maxPriority = 0;
-	for (size_t i = lIndex + 1; i < rIndex; ++i)
+	Token* nextNumber = tokenOperator->next();
+	Token* prevNumber = tokenOperator->prev();
+
+	Token* nextOperator = nextNumber->next();
+	Token* prevOperator = prevNumber->prev();
+
+	if (prevOperator == nullptr && nextOperator == nullptr)
+		return tokenOperator;
+
+	// 2+2*3 if we check this for the addition operator it has no previous operator
+	if (prevOperator == nullptr)
 	{
-		const Token& token = pTokenList[i];
+		/* Used in case nextOperator is not a number and it's because tokenOperator's next is a paraenthesis
+		  and in this case we need to solve the parenthesis first '2*(3-4)' */
+		if (!nextOperator->isOperator())
+			return nullptr;
 
-		//if maxPriority is 4 it's already the maximum possible (efficiency)
-		if (maxPriority == TOKEN_MAX_PRIORITY)
-			break;
+		/* We always need to have 3 operators to compare for cases like '2-3*3#2'
+			without this check it would have returned the multiply operator*/
+		if (nextOperator->next()->next() != nullptr)
+			return nullptr;
 
-		if (token.type() != Token::Type::Operator)
-			continue;
-
-		// Search for operator that has the biggest priority in that parenthesis
-		if (token.priority() <= maxPriority)
-			continue;
-
-		index = i;
-		maxPriority = token.priority();
+		if (tokenOperator->priority() >= nextOperator->priority())
+			return tokenOperator;
+		else if (nextOperator->next()->isNumber())
+			return nextOperator;
+		else
+			return nullptr;  /* In this case it should not return the multiplication operator 2+2*(3-4) */
+		
 	}
-	return index;
+
+	// 2+2*3 if we check this for the multiplication operator it has no next operator
+	if (nextOperator == nullptr)
+	{
+		/* Used in case prevOperator is not a number and it's because tokenOperator's prev is a paraenthesis
+		  and in this case we need to solve the parenthesis first '(3-4)*2'*/
+		if (!prevOperator->isOperator())
+			return nullptr;
+
+		if (prevOperator->prev()->prev() != nullptr)
+			return nullptr;
+
+		if (tokenOperator->priority() >= prevOperator->priority())
+			return tokenOperator;
+		else if (prevOperator->prev()->isNumber())
+			return prevOperator;
+		else 
+			return nullptr; /* In this case it should not return the multiplication operator (3-4)*2+2 */
+	}
+
+	// Search for the highest priority between all 3 operators and save it to check if it is valid
+	const Token* returnOperator = priorityOperatorOfThree(tokenOperator, prevOperator, nextOperator);
+
+	// Used to check if the both terms of the operation are numbers else the parenthesis needs to be solved
+	if (!returnOperator->prev()->isNumber() || !returnOperator->next()->isNumber())
+		return nullptr;
+
+	return returnOperator;
+}
+
+void TokenList::addToken(const Token& token)
+{
+	Token* temp = new Token(token);
+
+	if (head == nullptr)
+	{
+		head = tail = temp;
+	}
+	else
+	{
+		tail->setNext(temp);
+		temp->setPrev(tail);
+		tail = temp;
+
+		tail->setNext(nullptr);
+	}
+
+	size_++;
+}
+
+void TokenList::removeToken(const Token* token)
+{
+	if (head == nullptr || token == nullptr)
+		return;
+
+	if (head == token)
+		head = token->next();
+
+	if (token->next() != nullptr)
+		token->next()->setPrev(token->prev());
+
+	if (token->prev() != nullptr)
+		token->prev()->setNext(token->next());
+
+	size_--;
+	delete token;
+}
+
+void TokenList::clear()
+{
+	Token* token = head;
+	while (token != nullptr)
+	{
+		Token* next = token->next();
+		delete token;
+		token = next;
+	}
+	head = nullptr;
+	size_ = 0;
 }

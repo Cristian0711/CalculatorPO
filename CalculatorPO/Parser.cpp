@@ -3,19 +3,20 @@
 bool Parser::validParenthesis(const TokenList& tokenList)
 {
 	std::string stack = "";
-	for (int i = 0; i < tokenList.size(); ++i)
+	Token*		token = tokenList.front();
+
+	while (token != nullptr)
 	{
-		const Token& token = tokenList[i];
-		if (token.type() == Token::Type::LeftParenthesis)
+		if (token->type() == Token::Type::LeftParenthesis)
 		{
-			stack += token.string();
+			stack += token->string();
 		}
-		else if (token.type() == Token::Type::RightParenthesis)
+		else if (token->type() == Token::Type::RightParenthesis)
 		{
 			if (stack.empty())
 				return false;
-
-			const char& c = token.string().at(0);
+			
+			const char& c = token->string().at(0);
 			if (c == ')' && stack.back() != '(' ||
 				c == ']' && stack.back() != '[' ||
 				c == '}' && stack.back() != '{')
@@ -23,6 +24,8 @@ bool Parser::validParenthesis(const TokenList& tokenList)
 
 			stack.pop_back();
 		}
+
+		token = token->next();
 	}
 
 	return stack.empty();
@@ -30,47 +33,52 @@ bool Parser::validParenthesis(const TokenList& tokenList)
 
 bool Parser::validTokens(const TokenList& tokenList)
 {
-	for (int i = 0; i < tokenList.size(); ++i)
+	if (tokenList.empty())
+		return false;
+
+	Token* token = tokenList.front();
+	while (token != nullptr)
 	{
-		const Token& token = tokenList[i];
-		if (token.type() == Token::Type::Operator)
+		if (token->type() == Token::Type::Operator)
 		{
 			// First and last tokens cannot be operators
-			if (i == 0 || i == tokenList.size() - 1)
+			if (token == tokenList.front() || token == tokenList.back())
 				return false;
 
 			// The prev token must be a number or right parenthesis
-			const Token& prevToken = tokenList[i - 1];
-			if (prevToken.type() != Token::Type::Number &&
-				prevToken.type() != Token::Type::RightParenthesis)
+			const Token* prevToken = token->prev();
+			if (prevToken->type() != Token::Type::Number &&
+				prevToken->type() != Token::Type::RightParenthesis)
 				return false;
 		}
 
-		if (token.type() == Token::Type::LeftParenthesis)
+		if (token->type() == Token::Type::LeftParenthesis)
 		{
 			// Last token cannot be an left parenthesis
-			if (i == tokenList.size() - 1)
+			if (token == tokenList.back())
 				return false;
 
 			// The next token must be a number
-			const Token& nextToken = tokenList[i + 1];
-			if (nextToken.type() != Token::Type::Number &&
-				nextToken.type() != Token::Type::LeftParenthesis)
+			const Token* nextToken = token->next();
+			if (nextToken->type() != Token::Type::Number &&
+				nextToken->type() != Token::Type::LeftParenthesis)
 				return false;
 		}
 
-		if (token.type() == Token::Type::Number)
+		if (token->type() == Token::Type::Number)
 		{
-			if (i == tokenList.size() - 1)
-				continue;
+			if (token == tokenList.back())
+				break;
 
 			// The next token must be an operator or right paranthesis
-			const Token& nextToken = tokenList[i + 1];
-			if (nextToken.type() != Token::Type::Operator &&
-				nextToken.type() != Token::Type::RightParenthesis)
+			const Token* nextToken = token->next();
+			if (nextToken->type() != Token::Type::Operator &&
+				nextToken->type() != Token::Type::RightParenthesis)
 				return false;
 		}
+		token = token->next();
 	}
+
 	return true;
 }
 
@@ -79,21 +87,21 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 	if (consoleExpression.length() == 0)
 		throw std::exception("CALCULATOR: No input given!");
 
-	static bool hasSign = false;
+	bool hasUnary = false;
 	for (int i = 0; i < consoleExpression.length(); ++i)
 	{
 		const char& c = consoleExpression[i];
 		if (isdigit(c))
 		{
 			// If it has a sign the start index must be modified
-			const size_t startIndex = hasSign ? i - 1 : i;
-			while (isdigit(consoleExpression[i]) || consoleExpression[i] == '.')
+			const size_t startIndex = hasUnary ? i - 1 : i;
+			while (i < consoleExpression.length() && isdigit(consoleExpression[i]) || consoleExpression[i] == '.')
 				++i;
 
 			const std::string number = std::string(consoleExpression, startIndex, i - startIndex);
 			tokenList += { Token::Type::Number, number };
 
-			hasSign = false;
+			hasUnary = false;
 			i -= 1;
 		}
 		else
@@ -151,18 +159,18 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 				break;
 			}
 
-			// Do not add the '-' to the token list if it's a negative number '-30'
+			// Do not add the '-/+' to the token list if it's an unary operator
 			if (tokenList.empty() && (c == '-' || c == '+'))
 			{
-				hasSign = true;
+				hasUnary = true;
 				continue;
 			}
 
-			// Used to work with '(-30)'
+			// Used to work with parenthesis '(-30)/(+30)'
 			if (!tokenList.empty() && 
-				tokenList.back().type() == Token::Type::LeftParenthesis && (c == '-' || c == '+'))
+				tokenList.back()->type() == Token::Type::LeftParenthesis && (c == '-' || c == '+'))
 			{
-				hasSign = true;
+				hasUnary = true;
 				continue;
 			}
 
