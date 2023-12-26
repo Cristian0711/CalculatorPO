@@ -31,7 +31,7 @@ public:
 	}
 
 	void			run();
-	Token			solveExpression(const Token* token) const;
+	Token			solveExpression(Token* token) const;
 	const Token&	solveExpression();
 
 private:

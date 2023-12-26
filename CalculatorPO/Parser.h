@@ -7,10 +7,7 @@
 class Parser
 {
 public:
-	Parser()
-	{
-
-	}
+	Parser() = default;
 
 	Parser(TokenList& tokenList, const std::string& consoleExpression)
 	{

@@ -46,7 +46,7 @@ public:
 		return type_;
 	}
 
-	inline size_t priority() const
+	inline unsigned char priority() const
 	{
 		return priority_;
 	}
@@ -100,6 +100,11 @@ public:
 	inline Token* prev() const
 	{
 		return prev_;
+	}
+
+	inline void setString(const std::string& string)
+	{
+		string_ = string;
 	}
 
 	inline void setNext(Token* token)
@@ -161,9 +166,9 @@ private:
 	Token* next_ = nullptr;
 	Token* prev_ = nullptr;
 
-	Type		type_;
-	size_t		priority_;
-	std::string	string_;
+	Type			type_;
+	unsigned char	priority_;
+	std::string		string_;
 };
 
 static Token operator+(const Token& firstToken, const Token& secondToken)

@@ -43,8 +43,8 @@ public:
 	void	addToken(const Token& token);
 	void	removeToken(const Token* token);
 
-	const Token* getPriorityOperator(const Token* tokenOperator) const;
-	const Token* priorityOperatorOfTokens(const Token* first, const Token* second, const Token* third = nullptr) const;
+	Token* getPriorityOperator(Token* tokenOperator) const;
+	Token* priorityOperatorOfTokens(Token* first, Token* second, Token* third = nullptr) const;
 
 	friend std::ostream& operator<<(std::ostream& os, const TokenList& tokenList);
 private:

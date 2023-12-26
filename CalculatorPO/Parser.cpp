@@ -3,7 +3,7 @@
 bool Parser::validParenthesis(const TokenList& tokenList)
 {
 	std::string stack = "";
-	Token* token = tokenList.front();
+	Token*		token = tokenList.front();
 
 	while (token != nullptr)
 	{
@@ -88,12 +88,12 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 		throw std::exception("CALCULATOR: No input given!");
 
 	bool hasUnary = false;
-	for (int i = 0; i < consoleExpression.length(); ++i)
+	for (size_t i = 0; i < consoleExpression.length(); ++i)
 	{
 		const char& c = consoleExpression[i];
 		if (isdigit(c))
 		{
-			// If it has a sign the start index must be modified
+			// If it has an unary operator the start index is modified to i-1
 			const size_t startIndex = hasUnary ? i - 1 : i;
 			while (i < consoleExpression.length() && isdigit(consoleExpression[i]) || consoleExpression[i] == '.')
 				++i;
@@ -159,16 +159,9 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 				break;
 			}
 
-			// Do not add the '-/+' to the token list if it's an unary operator
-			if (tokenList.empty() && (c == '-' || c == '+'))
-			{
-				hasUnary = true;
-				continue;
-			}
-
-			// Used to work with parenthesis '(-30)/(+30)'
-			if (!tokenList.empty() &&
-				tokenList.back()->type() == Token::Type::LeftParenthesis && (c == '-' || c == '+'))
+			// Do not add the '-/+' to the token list if it's an unary operator '(-30)/(+30)' / '-30/+30'
+			if ((tokenList.empty() || tokenList.back()->type() == Token::Type::LeftParenthesis)
+				&& (c == '-' || c == '+'))
 			{
 				hasUnary = true;
 				continue;

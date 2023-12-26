@@ -1,11 +1,18 @@
 #include "Calculator.h"
 
-Token Calculator::solveExpression(const Token* token) const
+Token Calculator::solveExpression(Token* token) const
 {
-	const Token& leftToken	= *token->prev();
-	const Token& rightToken = *token->next();
+	Token&			leftToken	= *token->prev();
+	const Token&	rightToken	= *token->next();
+	Token*			leftOperator = leftToken.prev();
+	
+	bool subFix = false;
+	if (leftOperator != nullptr && (token->string() == "+" || token->string() == "-") && leftOperator->string() == "-")
+		subFix = true;
 
 	Token result;
+
+	std::cout << "CALCULUS: " << leftToken << ' ' << rightToken << '\n';
 
 	switch (token->string().at(0)) {
 	default:
@@ -25,10 +32,16 @@ Token Calculator::solveExpression(const Token* token) const
 		result = leftToken / rightToken;
 		break;
 	case '+':
-		result = leftToken + rightToken;
+		if (subFix)
+			result = ((double)leftToken * -1 + (double)rightToken) * -1;
+		else
+			result = leftToken + rightToken;
 		break;
 	case '-':
-		result = leftToken - rightToken;
+		if (subFix)
+			result = leftToken + rightToken;
+		else
+			result = leftToken - rightToken;
 		break;
 	}
 
@@ -44,13 +57,15 @@ const Token& Calculator::solveExpression()
 		{
 			if (token->isOperator())
 			{
-				const Token* operatorToken = tokenList.getPriorityOperator(token);
+				Token* operatorToken = tokenList.getPriorityOperator(token);
 
 				if (operatorToken == nullptr)
 				{
 					token = token->next();
 					continue;
 				}
+
+				//std::cout << "OPERATOR: " << *operatorToken << '\n';
 
 				const Token result = solveExpression(operatorToken);
 

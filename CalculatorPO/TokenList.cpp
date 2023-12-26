@@ -1,15 +1,16 @@
 #include "TokenList.h"
 
 // This function also checks for validity, works with 2 tokens also where third is nullptr
-const Token* TokenList::priorityOperatorOfTokens(const Token* first, const Token* second, const Token* third) const
+Token* TokenList::priorityOperatorOfTokens(Token* first, Token* second, Token* third) const
 {
 	if (first == nullptr || second == nullptr)
 		return nullptr;
 
-	const Token* returnOperator = nullptr;
+	Token* returnOperator = nullptr;
 
 	if (third != nullptr)
 	{
+		//std::cout << *first << ' ' << *second << ' ' << *third << '\n';
 		if (first->priority() >= second->priority() && first->priority() >= third->priority())
 		{
 			returnOperator = first;
@@ -25,6 +26,7 @@ const Token* TokenList::priorityOperatorOfTokens(const Token* first, const Token
 	}
 	else
 	{
+		//std::cout << *first << ' ' << *second << '\n';
 		if (first->priority() >= second->priority())
 			returnOperator = first;
 		else
@@ -38,7 +40,7 @@ const Token* TokenList::priorityOperatorOfTokens(const Token* first, const Token
 	return returnOperator;
 }
 
-const Token* TokenList::getPriorityOperator(const Token* tokenOperator) const
+Token* TokenList::getPriorityOperator(Token* tokenOperator) const
 {
 	Token* nextNumber = tokenOperator->next();
 	Token* prevNumber = tokenOperator->prev();
@@ -53,7 +55,12 @@ const Token* TokenList::getPriorityOperator(const Token* tokenOperator) const
 		where prevOperator = '(' and nextOperator = ')'*/
 	if (prevOperator != nullptr && nextOperator != nullptr &&
 		!prevOperator->isOperator() && !nextOperator->isOperator())
+	{
+		if (!prevNumber->isNumber() || !nextNumber->isNumber())
+			return nullptr;
+
 		return tokenOperator;
+	}
 
 	// 2+2*3 if we check this for the addition operator it has no previous operator
 	if (prevOperator == nullptr)
@@ -65,11 +72,12 @@ const Token* TokenList::getPriorityOperator(const Token* tokenOperator) const
 
 		/* We always need to have 3 operators when possible to compare for cases like '2-3*3#2'
 			without this check it would have returned the multiply operator*/
-		const Token* thirdOperator = nextOperator->next()->next();
-		if (thirdOperator != nullptr && thirdOperator->isOperator())
-			return priorityOperatorOfTokens(tokenOperator, nextOperator, thirdOperator);
+		Token* thirdOperator = nextOperator->next()->next();
+		if (thirdOperator != nullptr && !thirdOperator->isOperator())
+			thirdOperator = nullptr;
 
-		return priorityOperatorOfTokens(tokenOperator, nextOperator);
+		// If the third operator isn't an operator this will compare only the 2 of them (thirdOperator = nullptr)
+		return priorityOperatorOfTokens(tokenOperator, nextOperator, thirdOperator);
 	}
 
 	// 2+2*3 if we check this for the multiplication operator it has no next operator
@@ -82,15 +90,16 @@ const Token* TokenList::getPriorityOperator(const Token* tokenOperator) const
 
 		/* We always need to have 3 operators when possible to compare for cases like '3#2*3-2'
 			without this check it would have returned the multiply operator*/
-		const Token* thirdOperator = prevOperator->prev()->prev();
+		Token* thirdOperator = prevOperator->prev()->prev();
 		if (thirdOperator != nullptr && thirdOperator->isOperator())
-			return priorityOperatorOfTokens(tokenOperator, prevOperator, thirdOperator);
+			return priorityOperatorOfTokens(thirdOperator, prevOperator, tokenOperator);
 
-		return priorityOperatorOfTokens(tokenOperator, prevOperator);
+		// If the third operator isn't an operator this will compare only the 2 of them (thirdOperator = nullptr)
+		return priorityOperatorOfTokens(prevOperator, tokenOperator);
 	}
 
 	// Search for the highest priority between all 3 operators if all exists
-	return priorityOperatorOfTokens(tokenOperator, prevOperator, nextOperator);
+	return priorityOperatorOfTokens(prevOperator, tokenOperator, nextOperator);
 }
 
 void TokenList::addToken(const Token& token)
