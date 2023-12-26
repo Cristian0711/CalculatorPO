@@ -10,7 +10,6 @@ Token* TokenList::priorityOperatorOfTokens(Token* first, Token* second, Token* t
 
 	if (third != nullptr)
 	{
-		//std::cout << *first << ' ' << *second << ' ' << *third << '\n';
 		if (first->priority() >= second->priority() && first->priority() >= third->priority())
 		{
 			returnOperator = first;
@@ -26,7 +25,6 @@ Token* TokenList::priorityOperatorOfTokens(Token* first, Token* second, Token* t
 	}
 	else
 	{
-		//std::cout << *first << ' ' << *second << '\n';
 		if (first->priority() >= second->priority())
 			returnOperator = first;
 		else

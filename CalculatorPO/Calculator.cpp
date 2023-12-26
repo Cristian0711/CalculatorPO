@@ -12,8 +12,6 @@ Token Calculator::solveExpression(Token* token) const
 
 	Token result;
 
-	std::cout << "CALCULUS: " << leftToken << ' ' << rightToken << '\n';
-
 	switch (token->string().at(0)) {
 	default:
 		throw std::exception("CALCULATOR: The given operator is invalid!");
@@ -64,8 +62,6 @@ const Token& Calculator::solveExpression()
 					token = token->next();
 					continue;
 				}
-
-				//std::cout << "OPERATOR: " << *operatorToken << '\n';
 
 				const Token result = solveExpression(operatorToken);
 
