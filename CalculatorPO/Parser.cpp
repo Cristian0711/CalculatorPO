@@ -1,15 +1,16 @@
 #include "Parser.h"
+#include <stack>
 
 bool Parser::validParenthesis(const TokenList& tokenList)
 {
-	std::string stack = "";
-	Token*		token = tokenList.front();
+	std::stack<char> stack;
 
+	Token*		token = tokenList.front();
 	while (token != nullptr)
 	{
 		if (token->type() == Token::Type::LeftParenthesis)
 		{
-			stack += token->string();
+			stack.push(token->string().at(0));
 		}
 		else if (token->type() == Token::Type::RightParenthesis)
 		{
@@ -17,12 +18,12 @@ bool Parser::validParenthesis(const TokenList& tokenList)
 				return false;
 
 			const char& c = token->string().at(0);
-			if (c == ')' && stack.back() != '(' ||
-				c == ']' && stack.back() != '[' ||
-				c == '}' && stack.back() != '{')
+			if (c == ')' && stack.top() != '(' ||
+				c == ']' && stack.top() != '[' ||
+				c == '}' && stack.top() != '{')
 				return false;
 
-			stack.pop_back();
+			stack.pop();
 		}
 
 		token = token->next();
@@ -58,10 +59,22 @@ bool Parser::validTokens(const TokenList& tokenList)
 			if (token == tokenList.back())
 				return false;
 
-			// The next token must be a number
+			// The next token must be a number or left parenthesis
 			const Token* nextToken = token->next();
 			if (nextToken->type() != Token::Type::Number &&
 				nextToken->type() != Token::Type::LeftParenthesis)
+				return false;
+		}
+
+		if (token->type() == Token::Type::RightParenthesis)
+		{
+			if (token == tokenList.back())
+				break;
+
+			// The next token must be an operator or right parenthesis
+			const Token* nextToken = token->next();
+			if (nextToken->type() != Token::Type::Operator &&
+				nextToken->type() != Token::Type::RightParenthesis)
 				return false;
 		}
 
@@ -82,92 +95,118 @@ bool Parser::validTokens(const TokenList& tokenList)
 	return true;
 }
 
+bool Parser::processNumbers(TokenList& tokenList, const std::string& consoleExpression, size_t& index)
+{
+	const size_t startIndex = index;
+	bool hasDecimalPoint = false;
+
+	index++;
+	while (index < consoleExpression.length() && isdigit(consoleExpression[index]) || consoleExpression[index] == '.')
+	{
+		if (consoleExpression[index] == '.' && hasDecimalPoint)
+			throw std::exception("CALCULATOR: Invalid number was given!");
+
+		if (consoleExpression[index] == '.')
+			hasDecimalPoint = true;
+
+		++index;
+	}
+
+	const std::string number = std::string(consoleExpression, startIndex, index - startIndex);
+	tokenList += { Token::Type::Number, number };
+
+	index -= 1;
+
+	return true;
+}
+
+// Do not add the '-/+' to the token list if it's an unary operator '(-30)/(+30)' / '-30/+30'
+bool Parser::processUnaryOperator(TokenList& tokenList, const char& c)
+{
+	if ((c == '-' || c == '+') &&
+		(tokenList.empty() || tokenList.back()->type() == Token::Type::LeftParenthesis))
+		return true;
+
+	return false;
+}
+
+void Parser::processOperators(TokenList& tokenList, const char& c)
+{
+	Token::Type type = Token::Type::Undefined;
+	unsigned int priority = 0;
+
+	switch (c)
+	{
+	default:
+		throw std::exception("CALCULATOR: Invalid expression was given!");
+	case ' ':
+		return;
+	case '(':
+		type = Token::Type::LeftParenthesis;
+		break;
+	case '[':
+		type = Token::Type::LeftParenthesis;
+		break;
+	case '{':
+		type = Token::Type::LeftParenthesis;
+		break;
+	case ')':
+		type = Token::Type::RightParenthesis;
+		break;
+	case ']':
+		type = Token::Type::RightParenthesis;
+		break;
+	case '}':
+		type = Token::Type::RightParenthesis;
+		break;
+	case '^':
+		type = Token::Type::Operator;
+		priority = 3;
+		break;
+	case '#':
+		type = Token::Type::Operator;
+		priority = 3;
+		break;
+	case '*':
+		type = Token::Type::Operator;
+		priority = 2;
+		break;
+	case '/':
+		type = Token::Type::Operator;
+		priority = 2;
+		break;
+	case '+':
+		type = Token::Type::Operator;
+		priority = 1;
+		break;
+	case '-':
+		type = Token::Type::Operator;
+		priority = 1;
+		break;
+	}
+
+	tokenList += { type, std::string(1, c), priority };
+}
+
 void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpression) const
 {
 	if (consoleExpression.length() == 0)
 		throw std::exception("CALCULATOR: No input given!");
 
-	bool hasUnary = false;
 	for (size_t i = 0; i < consoleExpression.length(); ++i)
 	{
 		const char& c = consoleExpression[i];
-		if (isdigit(c))
+
+		bool hasUnary = processUnaryOperator(tokenList, c);
+
+		if (isdigit(c) || hasUnary)
 		{
-			// If it has an unary operator the start index is modified to i-1
-			const size_t startIndex = hasUnary ? i - 1 : i;
-			while (i < consoleExpression.length() && isdigit(consoleExpression[i]) || consoleExpression[i] == '.')
-				++i;
-
-			const std::string number = std::string(consoleExpression, startIndex, i - startIndex);
-			tokenList += { Token::Type::Number, number };
-
+			processNumbers(tokenList, consoleExpression, i);
 			hasUnary = false;
-			i -= 1;
 		}
 		else
 		{
-			Token::Type type = Token::Type::Undefined;
-			unsigned int priority = 0;
-
-			switch (c)
-			{
-			default:
-				throw std::exception("CALCULATOR: Invalid expression was given!");
-			case ' ':
-				continue;
-			case '(':
-				type = Token::Type::LeftParenthesis;
-				break;
-			case '[':
-				type = Token::Type::LeftParenthesis;
-				break;
-			case '{':
-				type = Token::Type::LeftParenthesis;
-				break;
-			case ')':
-				type = Token::Type::RightParenthesis;
-				break;
-			case ']':
-				type = Token::Type::RightParenthesis;
-				break;
-			case '}':
-				type = Token::Type::RightParenthesis;
-				break;
-			case '^':
-				type = Token::Type::Operator;
-				priority = 4;
-				break;
-			case '#':
-				type = Token::Type::Operator;
-				priority = 4;
-				break;
-			case '*':
-				type = Token::Type::Operator;
-				priority = 3;
-				break;
-			case '/':
-				type = Token::Type::Operator;
-				priority = 3;
-				break;
-			case '+':
-				type = Token::Type::Operator;
-				priority = 2;
-				break;
-			case '-':
-				type = Token::Type::Operator;
-				priority = 2;
-				break;
-			}
-
-			// Do not add the '-/+' to the token list if it's an unary operator '(-30)/(+30)' / '-30/+30'
-			if ((tokenList.empty() || tokenList.back()->type() == Token::Type::LeftParenthesis)
-				&& (c == '-' || c == '+'))
-			{
-				hasUnary = true;
-				continue;
-			}
-
-			tokenList += { type, std::string(1, c), priority };
+			processOperators(tokenList, c);
 		}
 	}
 

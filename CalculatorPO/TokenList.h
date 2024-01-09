@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Token.h"
 
-class TokenList
+class TokenList : public Printable
 {
 public:
 	TokenList() = default;
@@ -17,7 +17,6 @@ public:
 	{
 		return size_;
 	}
-
 
 	inline bool empty() const
 	{
@@ -33,11 +32,13 @@ public:
 	{
 		return tail;
 	}
-
+	
 	void operator+=(const Token& token)
 	{
 		addToken(token);
 	}
+
+	const std::string string() const;
 
 	void	clear();
 	void	addToken(const Token& token);
@@ -48,8 +49,8 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& os, const TokenList& tokenList);
 private:
-	size_t			size_ = 0;
+	size_t	size_ = 0;
 
-	Token* head = nullptr;
-	Token* tail = nullptr;
+	Token*	head = nullptr;
+	Token*	tail = nullptr;
 };

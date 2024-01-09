@@ -151,6 +151,18 @@ void TokenList::clear()
 	size_ = 0;
 }
 
+const std::string TokenList::string() const
+{
+	std::string str = "";
+	Token* token = head;
+	while (token != nullptr)
+	{
+		str += token->normalize();
+		token = token->next();
+	}
+	return str;
+}
+
 std::ostream& operator<<(std::ostream& os, const TokenList& tokenList)
 {
 	Token* token = tokenList.head;

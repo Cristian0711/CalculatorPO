@@ -129,11 +129,13 @@
   <ItemGroup>
     <ClCompile Include="Calculator.cpp" />
     <ClCompile Include="CalculatorPO.cpp" />
+    <ClCompile Include="GUI.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="TokenList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Calculator.h" />
+    <ClInclude Include="GUI.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="TokenList.h" />

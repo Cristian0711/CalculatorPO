@@ -2,10 +2,11 @@
 
 #include <string>
 #include <stdexcept>
+#include "GUI.h"
 
 #define TOKEN_MAX_PRIORITY 4
 
-class Token
+class Token : public Printable
 {
 public:
 	enum class Type {
@@ -51,7 +52,7 @@ public:
 		return priority_;
 	}
 
-	inline const std::string& string() const
+	inline const std::string string() const
 	{
 		return string_;
 	}
@@ -196,3 +197,12 @@ static std::ostream& operator<<(std::ostream& os, const Token& token)
 	os << token.normalize();
 	return os;
 }
+
+class ErrorToken : public Token
+{
+public:
+	ErrorToken(const std::string& error)
+	{
+		setString(error);
+	}
+};

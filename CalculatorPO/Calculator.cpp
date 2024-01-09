@@ -1,14 +1,14 @@
 #include "Calculator.h"
 
-Token Calculator::solveExpression(Token* token) const
+Token Calculator::solveTheCalculation(Token* token) const
 {
 	Token&			leftToken	= *token->prev();
 	const Token&	rightToken	= *token->next();
 	Token*			leftOperator = leftToken.prev();
 	
-	bool subFix = false;
+	bool signFix = false;
 	if (leftOperator != nullptr && (token->string() == "+" || token->string() == "-") && leftOperator->string() == "-")
-		subFix = true;
+		signFix = true;
 
 	Token result;
 
@@ -19,7 +19,7 @@ Token Calculator::solveExpression(Token* token) const
 		result = pow(leftToken, rightToken);
 		break;
 	case '#':
-		result = pow((double)leftToken, 1.0 / (double)rightToken);
+		result = pow((long double)leftToken, 1.0 / (long double)rightToken);
 		break;
 	case '*':
 		result = leftToken * rightToken;
@@ -30,13 +30,13 @@ Token Calculator::solveExpression(Token* token) const
 		result = leftToken / rightToken;
 		break;
 	case '+':
-		if (subFix)
-			result = ((double)leftToken * -1 + (double)rightToken) * -1;
+		if (signFix)
+			result = ((long double)leftToken * -1 + (long double)rightToken) * -1;
 		else
 			result = leftToken + rightToken;
 		break;
 	case '-':
-		if (subFix)
+		if (signFix)
 			result = leftToken + rightToken;
 		else
 			result = leftToken - rightToken;
@@ -63,7 +63,7 @@ const Token& Calculator::solveExpression()
 					continue;
 				}
 
-				const Token result = solveExpression(operatorToken);
+				const Token result = solveTheCalculation(operatorToken);
 
 				// 3+3-3 -> 6+3-3 ->
 				*operatorToken->prev() = result;
@@ -74,7 +74,7 @@ const Token& Calculator::solveExpression()
 				tokenList.removeToken(operatorToken);
 
 				if (debug == true)
-					std::cout << tokenList << '\n';
+					GUI::print(&tokenList);
 			}
 
 			// Remove parenthesis 2+(3)+4
@@ -93,29 +93,109 @@ const Token& Calculator::solveExpression()
 	return *tokenList.front();
 }
 
-void Calculator::run()
+Token Calculator::solve(const std::string& expression)
 {
-	std::cin.getline(consoleExpression, consoleSize);
-	if (std::cin.fail())
-	{
-		std::cin.clear();
-		std::cin.ignore(LLONG_MAX, '\n');
-		throw std::exception(std::string("CALCULATOR: The sequence is bigger than " + std::to_string(consoleSize) + " characters!").c_str());
-	}
-
-	if (strcmp(consoleExpression, "exit") == 0)
-	{
-		active = false;
-		return;
-	}
-
 	try
 	{
 		Parser parser;
-		parser.getTokens(tokenList, consoleExpression);
-		//parser.getTokens(tokenList, "(-1+2-3)+4+5*(6+7/8)#9");
+		parser.getTokens(tokenList, expression);
 
-		std::cout << "Answer: " << solveExpression() << '\n';
+		Token answer = solveExpression();
+		return answer;
+	}
+	catch (const std::exception& exception)
+	{
+		std::cout << exception.what() << '\n';
+	
+		ErrorToken token("invalid expression");
+		return token;
+	}
+}
+
+void Calculator::handleConsoleExpression()
+{
+	std::cout << "Enter the expression: ";
+
+	std::string consoleExpression;
+	std::cin.ignore(LLONG_MAX, '\n');
+	std::getline(std::cin, consoleExpression);
+
+	std::cout << "Answer: " << solve(consoleExpression) << '\n';
+}
+
+void Calculator::handleFileExpression(bool saveToFile)
+{
+	std::string fileName, saveFileName;
+	std::cout << "Enter the file path: ";
+	std::cin >> fileName;
+
+	std::ifstream fileStream(fileName);
+	if (fileStream.fail())
+		throw std::exception("CALCULATOR: Invalid file path!");
+
+	std::ofstream saveFileStream;
+	if (saveToFile)
+	{
+		std::cout << "Enter the save file path: ";
+		std::cin >> saveFileName;
+
+		saveFileStream.open(saveFileName);
+		if (saveFileStream.fail())
+			throw std::exception("CALCULATOR: Invalid save file path!");
+	}
+
+	std::string line;
+	while (std::getline(fileStream, line))
+	{
+		if (saveToFile)
+		{
+			saveFileStream << "Answer: " << line << '=' << solve(line) << '\n';
+		}
+		else
+		{
+			std::cout << "Answer: " << line << '=' << solve(line) << '\n';
+		}
+		tokenList.clear();
+	}
+
+	fileStream.close();
+	saveFileStream.close();
+}
+
+void Calculator::run(const char* expression)
+{
+	if (expression != nullptr)
+	{
+		std::cout << "Answer: " << solve(expression) << '\n';
+		return;
+	}
+
+	GUI::showConsoleMenu();
+	std::cin >> calculatorMode;
+
+	try
+	{
+		if (strcmp(calculatorMode, "1") == 0)
+		{
+			handleConsoleExpression();
+		}
+		else if (strcmp(calculatorMode, "2") == 0)
+		{
+			handleFileExpression(false);
+		}
+		else if (strcmp(calculatorMode, "3") == 0)
+		{
+			handleFileExpression(true);
+		}
+		else if (strcmp(calculatorMode, "exit") == 0)
+		{
+			active = false;
+			return;
+		}
+		else
+		{
+			throw std::exception("CALCULATOR: Invalid selection was given!");
+		}
 	}
 	catch (const std::exception& exception)
 	{

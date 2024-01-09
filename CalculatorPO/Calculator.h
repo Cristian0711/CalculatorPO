@@ -2,10 +2,12 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 #include "TokenList.h"
 #include "Parser.h"
+#include "GUI.h"
 
-#define DEFAULT_CONSOLE_SIZE 300
+#define DEFAULT_CALCULATOR_MODE_SIZE 10
 
 class Calculator
 {
@@ -13,14 +15,14 @@ public:
 	Calculator(bool debug = false)
 		: debug(debug)
 	{
-		consoleExpression = new char[consoleSize];
+		calculatorMode = new char[calculatorModeSize];
 		system("title Proiect Calculator PO");
 	}
 
-	Calculator(size_t consoleSize, bool debug = false)
-		: consoleSize(consoleSize), debug(debug)
+	Calculator(size_t calculatorModeSize, bool debug = false)
+		: calculatorModeSize(calculatorModeSize), debug(debug)
 	{
-		consoleExpression = new char[consoleSize];
+		calculatorMode = new char[calculatorModeSize];
 
 		system("title Proiect Calculator PO");
 	}
@@ -30,14 +32,18 @@ public:
 		return active;
 	}
 
-	void			run();
-	Token			solveExpression(Token* token) const;
+	void			handleConsoleExpression();
+	void			handleFileExpression(bool saveToFile);
+
+	Token			solve(const std::string& expression);
+	void			run(const char* expression = nullptr);
 	const Token&	solveExpression();
+	Token			solveTheCalculation(Token* token) const;
 
 private:
-	char* consoleExpression = nullptr;
+	char*			calculatorMode = nullptr;
 	bool			active = true;
 	bool			debug = false;
 	TokenList		tokenList;
-	const size_t	consoleSize = DEFAULT_CONSOLE_SIZE;
+	const size_t	calculatorModeSize = DEFAULT_CALCULATOR_MODE_SIZE;
 };
