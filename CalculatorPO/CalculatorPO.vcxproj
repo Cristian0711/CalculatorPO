@@ -135,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Calculator.h" />
+    <ClInclude Include="Exceptions.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="Token.h" />

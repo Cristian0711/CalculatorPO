@@ -83,7 +83,7 @@ bool Parser::validTokens(const TokenList& tokenList)
 			if (token == tokenList.back())
 				break;
 
-			// The next token must be an operator or right paranthesis
+			// The next token must be an operator or right parenthesis
 			const Token* nextToken = token->next();
 			if (nextToken->type() != Token::Type::Operator &&
 				nextToken->type() != Token::Type::RightParenthesis)
@@ -104,7 +104,7 @@ bool Parser::processNumbers(TokenList& tokenList, const std::string& consoleExpr
 	while (index < consoleExpression.length() && isdigit(consoleExpression[index]) || consoleExpression[index] == '.')
 	{
 		if (consoleExpression[index] == '.' && hasDecimalPoint)
-			throw std::exception("CALCULATOR: Invalid number was given!");
+			throw InvalidNumber();
 
 		if (consoleExpression[index] == '.')
 			hasDecimalPoint = true;
@@ -138,7 +138,7 @@ void Parser::processOperators(TokenList& tokenList, const char& c)
 	switch (c)
 	{
 	default:
-		throw std::exception("CALCULATOR: Invalid expression was given!");
+		throw InvalidExpression();
 	case ' ':
 		return;
 	case '(':
@@ -211,8 +211,8 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 	}
 
 	if (!validParenthesis(tokenList))
-		throw std::exception("CALCULATOR: Invalid parenthesis!");
+		throw InvalidParenthesis();
 
 	if (!validTokens(tokenList))
-		throw std::exception("CALCULATOR: Invalid expression!");
+		throw InvalidMathExpression();
 }

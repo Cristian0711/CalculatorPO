@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Token.h"
 
-class TokenList : public Printable
+class TokenList
 {
 public:
 	TokenList() = default;
@@ -37,8 +37,6 @@ public:
 	{
 		addToken(token);
 	}
-
-	const std::string string() const;
 
 	void	clear();
 	void	addToken(const Token& token);

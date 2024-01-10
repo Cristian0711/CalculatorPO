@@ -6,7 +6,7 @@
 
 #define TOKEN_MAX_PRIORITY 4
 
-class Token : public Printable
+class Token
 {
 public:
 	enum class Type {
@@ -52,7 +52,7 @@ public:
 		return priority_;
 	}
 
-	inline const std::string string() const
+	inline const std::string& string() const
 	{
 		return string_;
 	}

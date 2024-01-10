@@ -6,6 +6,7 @@
 #include "TokenList.h"
 #include "Parser.h"
 #include "GUI.h"
+#include "Exceptions.h"
 
 #define DEFAULT_CALCULATOR_MODE_SIZE 10
 

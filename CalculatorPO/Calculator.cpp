@@ -14,7 +14,7 @@ Token Calculator::solveTheCalculation(Token* token) const
 
 	switch (token->string().at(0)) {
 	default:
-		throw std::exception("CALCULATOR: The given operator is invalid!");
+		throw InvalidOperator();
 	case '^':
 		result = pow(leftToken, rightToken);
 		break;
@@ -26,7 +26,7 @@ Token Calculator::solveTheCalculation(Token* token) const
 		break;
 	case '/':
 		if (rightToken == 0)
-			throw std::exception("CALCULATOR: Cannot divide by 0!");
+			throw ZeroException();
 		result = leftToken / rightToken;
 		break;
 	case '+':
@@ -74,7 +74,7 @@ const Token& Calculator::solveExpression()
 				tokenList.removeToken(operatorToken);
 
 				if (debug == true)
-					GUI::print(&tokenList);
+					std::cout << tokenList << '\n';
 			}
 
 			// Remove parenthesis 2+(3)+4
@@ -103,11 +103,11 @@ Token Calculator::solve(const std::string& expression)
 		Token answer = solveExpression();
 		return answer;
 	}
-	catch (const std::exception& exception)
+	catch (const CalculatorException& exception)
 	{
 		std::cout << exception.what() << '\n';
 	
-		ErrorToken token("invalid expression");
+		ErrorToken token(exception.print());
 		return token;
 	}
 }

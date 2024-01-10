@@ -1,10 +1,5 @@
 #include "GUI.h"
 
-void GUI::print(Printable* print)
-{
-	std::cout << print->string() << '\n';
-}
-
 void GUI::showConsoleMenu()
 {
 	std::cout << "Calculator Menu\n";

@@ -4,6 +4,7 @@
 #include <stack>
 #include "Token.h"
 #include "TokenList.h"
+#include "Exceptions.h"
 
 class Parser
 {
