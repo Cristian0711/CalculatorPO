@@ -14,14 +14,7 @@ int main(int argc, char** argv)
 
     while (calculator.isActive())
     {
-        try
-        {
-            calculator.run();
-        }
-        catch (const std::exception& exception)
-        {
-            std::cout << exception.what() << '\n';
-        }
+        calculator.run();
     }
     system("pause");
 }
