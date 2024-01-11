@@ -126,3 +126,39 @@ public:
 		return "variable is not a number!";
 	}
 };
+
+class TokenNotNumber : public CalculatorException {
+public:
+	const char* what() const
+	{
+		return "CALCULATOR: This token is not a number!";
+	}
+	const char* print() const
+	{
+		return "token is not a number!";
+	}
+};
+
+class InvalidFilePath : public CalculatorException {
+public:
+	const char* what() const
+	{
+		return "CALCULATOR: Invalid file path!";
+	}
+	const char* print() const
+	{
+		return "invalid file path!";
+	}
+};
+
+class InvalidSelection : public CalculatorException {
+public:
+	const char* what() const
+	{
+		return "CALCULATOR: Invalid selection was given!";
+	}
+	const char* print() const
+	{
+		return "invalid selection!";
+	}
+};

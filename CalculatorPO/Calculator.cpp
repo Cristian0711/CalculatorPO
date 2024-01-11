@@ -135,7 +135,7 @@ void Calculator::handleFileExpression(bool saveToFile)
 
 	std::ifstream fileStream(fileName);
 	if (fileStream.fail())
-		throw std::exception("CALCULATOR: Invalid file path!");
+		throw InvalidFilePath();
 
 	std::ofstream saveFileStream;
 	if (saveToFile)
@@ -145,7 +145,7 @@ void Calculator::handleFileExpression(bool saveToFile)
 
 		saveFileStream.open(saveFileName);
 		if (saveFileStream.fail())
-			throw std::exception("CALCULATOR: Invalid save file path!");
+			throw InvalidFilePath();
 	}
 
 	std::string line;
@@ -233,7 +233,7 @@ void Calculator::run(std::string_view expression)
 		}
 		else
 		{
-			throw std::exception("CALCULATOR: Invalid selection was given!");
+			throw InvalidSelection();
 		}
 	}
 	catch (const std::exception& exception)

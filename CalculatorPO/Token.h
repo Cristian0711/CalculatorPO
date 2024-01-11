@@ -1,8 +1,7 @@
 #pragma once
 
 #include <string>
-#include <stdexcept>
-#include "GUI.h"
+#include "Exceptions.h"
 
 #define TOKEN_MAX_PRIORITY 4
 
@@ -60,7 +59,7 @@ public:
 	inline long double toDouble() const
 	{
 		if (type_ != Type::Number)
-			throw std::exception("TOKEN: This token is not a number!");
+			throw TokenNotNumber();
 
 		return std::stold(string_);
 	}
