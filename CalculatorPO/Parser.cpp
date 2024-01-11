@@ -1,5 +1,4 @@
 #include "Parser.h"
-#include <stack>
 
 bool Parser::validParenthesis(const TokenList& tokenList)
 {
