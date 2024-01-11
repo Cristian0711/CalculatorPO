@@ -59,7 +59,7 @@ void VariableList::loadVariablesFromFile(const std::string& path)
 
 }
 
-void VariableList::saveVariablesToFile(const std::string& path)
+void VariableList::saveVariablesToFile(const std::string& path) const
 {
 	std::ofstream file(path, std::ios::binary);
 

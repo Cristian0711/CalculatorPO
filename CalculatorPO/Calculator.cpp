@@ -177,7 +177,7 @@ void Calculator::handleLoadVariables()
 	variableList.loadVariablesFromFile(path);
 }
 
-void Calculator::handleSaveVariables()
+void Calculator::handleSaveVariables() const
 {
 	std::cout << "Enter the variables savefile path: ";
 	std::string path;

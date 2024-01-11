@@ -16,7 +16,7 @@ public:
 	Calculator(bool debug = false)
 		: debug(debug)
 	{
-		//system("title Proiect Calculator PO");
+		system("title Proiect Calculator PO");
 	}
 
 	inline bool isActive() const
@@ -27,7 +27,7 @@ public:
 	void			handleConsoleExpression();
 	void			handleFileExpression(bool saveToFile);
 	void			handleLoadVariables();
-	void			handleSaveVariables();
+	void			handleSaveVariables() const;
 	
 	Token			solve(std::string_view expression);
 	void			run(std::string_view expression);

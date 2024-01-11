@@ -16,7 +16,7 @@ public:
 	void addVariable(std::string_view name, std::string_view value);
 
 	void loadVariablesFromFile(const std::string& path);
-	void saveVariablesToFile(const std::string& path);
+	void saveVariablesToFile(const std::string& path) const;
 
 	void clear();
 

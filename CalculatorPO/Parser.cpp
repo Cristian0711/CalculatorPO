@@ -5,7 +5,7 @@ bool Parser::validParenthesis(const TokenList& tokenList)
 {
 	std::stack<char> stack;
 
-	Token*		token = tokenList.front();
+	Token* token = tokenList.front();
 	while (token != nullptr)
 	{
 		if (token->type() == Token::Type::LeftParenthesis)
