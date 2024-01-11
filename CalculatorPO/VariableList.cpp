@@ -88,3 +88,8 @@ void VariableList::saveVariablesToFile(const std::string& path)
 
 	file.close();
 }
+
+void VariableList::clear()
+{
+	variableList.clear();
+}

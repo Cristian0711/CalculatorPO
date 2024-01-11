@@ -215,6 +215,10 @@ void Calculator::run(std::string_view expression)
 		{
 			handleSaveVariables();
 		}
+		else if (calculatorMode == "6")
+		{
+			variableList.clear();
+		}
 		else if (calculatorMode == "exit")
 		{
 			active = false;

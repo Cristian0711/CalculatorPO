@@ -19,6 +19,8 @@ public:
 	void loadVariablesFromFile(const std::string& path);
 	void saveVariablesToFile(const std::string& path);
 
+	void clear();
+
 	std::string operator[](std::string_view) const;
 private:
 	std::vector<variableTuple> variableList;

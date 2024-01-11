@@ -9,5 +9,6 @@ void GUI::showConsoleMenu()
 	std::cout << "3 - Solve from file and save into file\n";
 	std::cout << "4 - Load variables from file\n";
 	std::cout << "5 - Save variables to file\n";
+	std::cout << "6 - Clear variables from memory\n";
 	std::cout << "Selection: ";
 }
