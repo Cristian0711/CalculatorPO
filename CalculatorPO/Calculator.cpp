@@ -151,6 +151,9 @@ void Calculator::handleFileExpression(bool saveToFile)
 	std::string line;
 	while (std::getline(fileStream, line))
 	{
+		if (line.empty())
+			continue;
+
 		if (saveToFile)
 		{
 			saveFileStream << line << '=' << solve(line) << '\n';
@@ -216,6 +219,10 @@ void Calculator::run(std::string_view expression)
 			handleSaveVariables();
 		}
 		else if (calculatorMode == "6")
+		{
+			std::cout << variableList;
+		}
+		else if (calculatorMode == "7")
 		{
 			variableList.clear();
 		}

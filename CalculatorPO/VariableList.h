@@ -21,6 +21,7 @@ public:
 	void clear();
 
 	std::string operator[](std::string_view) const;
+	friend std::ostream& operator<<(std::ostream& os, const VariableList& variableList);
 private:
 	std::vector<variableTuple> variableList;
 };

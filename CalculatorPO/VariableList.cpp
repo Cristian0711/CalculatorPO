@@ -69,7 +69,7 @@ void VariableList::saveVariablesToFile(const std::string& path)
 	size_t size = variableList.size();
 	file.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
 
-	for (variableTuple& tuple : variableList)
+	for (const variableTuple& tuple : variableList)
 	{
 		size_t nameSize = std::get<0>(tuple).size();
 		size_t valueSize = std::get<1>(tuple).size();
@@ -87,4 +87,19 @@ void VariableList::saveVariablesToFile(const std::string& path)
 void VariableList::clear()
 {
 	variableList.clear();
+}
+
+std::ostream& operator<<(std::ostream& os, const VariableList& variableList)
+{
+	if (variableList.variableList.empty())
+	{
+		os << "No variables in memory!\n";
+		return os;
+	}
+
+	for (const variableTuple& tuple : variableList.variableList)
+	{
+		os << std::get<0>(tuple) << '=' << std::get<1>(tuple) << '\n';
+	}
+	return os;
 }
