@@ -95,13 +95,13 @@ bool Parser::validTokens(const TokenList& tokenList)
 	return true;
 }
 
-bool Parser::processNumbers(TokenList& tokenList, const std::string& consoleExpression, size_t& index)
+void Parser::processNumbers(TokenList& tokenList, std::string_view consoleExpression, size_t& index)
 {
 	const size_t startIndex = index;
 	bool hasDecimalPoint = false;
 
 	index++;
-	while (index < consoleExpression.length() && isdigit(consoleExpression[index]) || consoleExpression[index] == '.')
+	while (index < consoleExpression.length() && (isdigit(consoleExpression[index]) || consoleExpression[index] == '.'))
 	{
 		if (consoleExpression[index] == '.' && hasDecimalPoint)
 			throw InvalidNumber();
@@ -116,8 +116,6 @@ bool Parser::processNumbers(TokenList& tokenList, const std::string& consoleExpr
 	tokenList += { Token::Type::Number, number };
 
 	index -= 1;
-
-	return true;
 }
 
 // Do not add the '-/+' to the token list if it's an unary operator '(-30)/(+30)' / '-30/+30'
@@ -188,12 +186,53 @@ void Parser::processOperators(TokenList& tokenList, const char& c)
 	tokenList += { type, std::string(1, c), priority };
 }
 
-void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpression) const
+void Parser::assignVariable(std::string_view expression, size_t& index)
+{
+	unsigned int count = std::ranges::count(expression, '=');
+
+	if (count > 1)
+		throw InvalidVariableExpression();
+
+	if (count == 0)
+		return;
+
+	index = expression.find('=') + 1;
+	variableName_ = expression.substr(0, index - 1);
+
+	bool contains_non_alpha
+		= !std::regex_match(variableName_.begin(), variableName_.end(), std::regex("^[A-Za-z]+$"));
+
+	if (contains_non_alpha)
+		throw InvalidVariableName();
+
+	hasVariable_ = true;
+}
+
+void Parser::processVariable(TokenList& tokenList, const VariableList& variableList, std::string_view consoleExpression, size_t& index)
+{
+	const size_t startIndex = index;
+
+	index++;
+	while (index < consoleExpression.length() && isalpha(consoleExpression[index]))
+		index++;
+
+	const std::string varName = std::string(consoleExpression, startIndex, index - startIndex);
+	const std::string varValue = variableList[varName];
+
+	tokenList += { Token::Type::Number, varValue };
+
+	index -= 1;
+}
+
+void Parser::getTokens(TokenList& tokenList, const VariableList& variableList, std::string_view consoleExpression)
 {
 	if (consoleExpression.length() == 0)
 		throw std::exception("CALCULATOR: No input given!");
 
-	for (size_t i = 0; i < consoleExpression.length(); ++i)
+	size_t startIndex = 0;
+	assignVariable(consoleExpression, startIndex);
+
+	for (size_t i = startIndex; i < consoleExpression.length(); ++i)
 	{
 		const char& c = consoleExpression[i];
 
@@ -203,6 +242,10 @@ void Parser::getTokens(TokenList& tokenList, const std::string& consoleExpressio
 		{
 			processNumbers(tokenList, consoleExpression, i);
 			hasUnary = false;
+		}
+		else if(isalpha(c))
+		{
+			processVariable(tokenList, variableList, consoleExpression, i);
 		}
 		else
 		{

@@ -34,7 +34,7 @@ public:
 
 	}
 
-	Token(Type type, const std::string& string, unsigned int priority = 0)
+	Token(Type type, std::string_view string, unsigned int priority = 0)
 		: type_(type), string_(string), priority_(priority)
 	{
 
@@ -52,7 +52,7 @@ public:
 		return priority_;
 	}
 
-	inline const std::string& string() const
+	inline std::string_view string() const
 	{
 		return string_;
 	}
@@ -103,7 +103,7 @@ public:
 		return prev_;
 	}
 
-	inline void setString(const std::string& string)
+	inline void setString(std::string_view string)
 	{
 		string_ = string;
 	}
@@ -201,7 +201,7 @@ static std::ostream& operator<<(std::ostream& os, const Token& token)
 class ErrorToken : public Token
 {
 public:
-	ErrorToken(const std::string& error)
+	ErrorToken(std::string_view error)
 	{
 		setString(error);
 	}

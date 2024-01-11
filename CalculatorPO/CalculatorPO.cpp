@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 
     while (calculator.isActive())
     {
-        calculator.run();
+        calculator.run("");
     }
     system("pause");
 }

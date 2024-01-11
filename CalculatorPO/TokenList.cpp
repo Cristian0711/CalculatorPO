@@ -1,12 +1,12 @@
 #include "TokenList.h"
 
 // This function also checks for validity, works with 2 tokens also where third is nullptr
-Token* TokenList::priorityOperatorOfTokens(Token* first, Token* second, Token* third) const
+const Token* TokenList::priorityOperatorOfTokens(const Token* first, const Token* second, const Token* third) const
 {
 	if (first == nullptr || second == nullptr)
 		return nullptr;
 
-	Token* returnOperator = nullptr;
+	const Token* returnOperator = nullptr;
 
 	if (third != nullptr)
 	{
@@ -38,7 +38,7 @@ Token* TokenList::priorityOperatorOfTokens(Token* first, Token* second, Token* t
 	return returnOperator;
 }
 
-Token* TokenList::getPriorityOperator(Token* tokenOperator) const
+const Token* TokenList::getPriorityOperator(const Token* tokenOperator) const
 {
 	Token* nextNumber = tokenOperator->next();
 	Token* prevNumber = tokenOperator->prev();

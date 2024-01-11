@@ -78,3 +78,51 @@ public:
 		return "invalid math expression given!";
 	}
 };
+
+class InvalidVariableExpression : public CalculatorException {
+public:
+	const char* what() const
+	{
+		return "CALCULATOR: Invalid variable expression was given!";
+	}
+	const char* print() const
+	{
+		return "invalid variable, more than one equal!";
+	}
+};
+
+class InvalidVariableName : public CalculatorException {
+public:
+	const char* what() const
+	{
+		return "CALCULATOR: Invalid variable name was given!";
+	}
+	const char* print() const
+	{
+		return "invalid variable name!";
+	}
+};
+
+class VariableNotInList : public CalculatorException {
+public:
+	const char* what() const
+	{
+		return "CALCULATOR: Variable was not in list!";
+	}
+	const char* print() const
+	{
+		return "variable not in list!";
+	}
+};
+
+class AssignedVariableNotNumber : public CalculatorException {
+public:
+	const char* what() const
+	{
+		return "CALCULATOR: Loaded variable must be a number!";
+	}
+	const char* print() const
+	{
+		return "variable is not a number!";
+	}
+};

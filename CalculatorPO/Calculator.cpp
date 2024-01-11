@@ -1,10 +1,10 @@
 #include "Calculator.h"
 
-Token Calculator::solveTheCalculation(Token* token) const
+Token Calculator::solveTheCalculation(const Token* token) const
 {
-	Token&			leftToken	= *token->prev();
+	const Token&	leftToken	= *token->prev();
 	const Token&	rightToken	= *token->next();
-	Token*			leftOperator = leftToken.prev();
+	const Token*	leftOperator = leftToken.prev();
 	
 	bool signFix = false;
 	if (leftOperator != nullptr && (token->string() == "+" || token->string() == "-") && leftOperator->string() == "-")
@@ -50,12 +50,12 @@ const Token& Calculator::solveExpression()
 {
 	while (tokenList.size() != 1)
 	{
-		Token* token = tokenList.front();
+		const Token* token = tokenList.front();
 		while (token != nullptr)
 		{
 			if (token->isOperator())
 			{
-				Token* operatorToken = tokenList.getPriorityOperator(token);
+				const Token* operatorToken = tokenList.getPriorityOperator(token);
 
 				if (operatorToken == nullptr)
 				{
@@ -93,14 +93,18 @@ const Token& Calculator::solveExpression()
 	return *tokenList.front();
 }
 
-Token Calculator::solve(const std::string& expression)
+Token Calculator::solve(std::string_view expression)
 {
 	try
 	{
 		Parser parser;
-		parser.getTokens(tokenList, expression);
+		parser.getTokens(tokenList, variableList, expression);
 
 		Token answer = solveExpression();
+
+		if (parser.hasVariable())
+			variableList.addVariable(parser.variableName(), answer.normalize());
+
 		return answer;
 	}
 	catch (const CalculatorException& exception)
@@ -149,11 +153,11 @@ void Calculator::handleFileExpression(bool saveToFile)
 	{
 		if (saveToFile)
 		{
-			saveFileStream << "Answer: " << line << '=' << solve(line) << '\n';
+			saveFileStream << line << '=' << solve(line) << '\n';
 		}
 		else
 		{
-			std::cout << "Answer: " << line << '=' << solve(line) << '\n';
+			std::cout << line << '=' << solve(line) << '\n';
 		}
 		tokenList.clear();
 	}
@@ -162,9 +166,25 @@ void Calculator::handleFileExpression(bool saveToFile)
 	saveFileStream.close();
 }
 
-void Calculator::run(const char* expression)
+void Calculator::handleLoadVariables()
 {
-	if (expression != nullptr)
+	std::cout << "Enter the variables file path: ";
+	std::string path;
+	std::cin >> path;
+	variableList.loadVariablesFromFile(path);
+}
+
+void Calculator::handleSaveVariables()
+{
+	std::cout << "Enter the variables savefile path: ";
+	std::string path;
+	std::cin >> path;
+	variableList.saveVariablesToFile(path);
+}
+
+void Calculator::run(std::string_view expression)
+{
+	if (expression.length() > 0)
 	{
 		std::cout << "Answer: " << solve(expression) << '\n';
 		return;
@@ -175,19 +195,27 @@ void Calculator::run(const char* expression)
 
 	try
 	{
-		if (strcmp(calculatorMode, "1") == 0)
+		if (calculatorMode == "1")
 		{
 			handleConsoleExpression();
 		}
-		else if (strcmp(calculatorMode, "2") == 0)
+		else if (calculatorMode == "2")
 		{
 			handleFileExpression(false);
 		}
-		else if (strcmp(calculatorMode, "3") == 0)
+		else if (calculatorMode == "3")
 		{
 			handleFileExpression(true);
 		}
-		else if (strcmp(calculatorMode, "exit") == 0)
+		else if (calculatorMode == "4")
+		{
+			handleLoadVariables();
+		}
+		else if (calculatorMode == "5")
+		{
+			handleSaveVariables();
+		}
+		else if (calculatorMode == "exit")
 		{
 			active = false;
 			return;
