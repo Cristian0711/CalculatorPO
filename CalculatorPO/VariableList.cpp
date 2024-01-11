@@ -14,11 +14,6 @@ void VariableList::addVariable(std::string_view name, std::string_view value)
 	variableList.push_back({ std::string(name), std::string(value) });
 }
 
-void VariableList::addVariable(variableTuple tuple)
-{
-	variableList.push_back(tuple);
-}
-
 std::string VariableList::operator[](std::string_view name) const
 {
 	for (const variableTuple& tuple : variableList)

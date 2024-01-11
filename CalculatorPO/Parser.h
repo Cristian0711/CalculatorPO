@@ -38,17 +38,17 @@ public:
 	void getTokens(TokenList& tokenList, const VariableList& variableList, std::string_view consoleExpression);
 
 private:
+	void		assignVariable(std::string_view expression, size_t& index);
+
 	static void processNumbers(TokenList& tokenList, std::string_view consoleExpression, size_t& index);
 	static void processVariable(TokenList& tokenList, const VariableList& variableList, std::string_view consoleExpression, size_t& index);
 	static void processOperators(TokenList& tokenList, const char& c);
 	static bool processUnaryOperator(TokenList& tokenList, const char& c);
 
-	void		assignVariable(std::string_view expression, size_t& index);
-
 	static bool validParenthesis(const TokenList& tokenList);
 	static bool validTokens(const TokenList& tokenList);
 
-	bool hasVariable_ = false;
+	bool		hasVariable_ = false;
 	std::string variableName_;
 	std::string variableValue;
 };

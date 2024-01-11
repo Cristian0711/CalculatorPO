@@ -14,7 +14,6 @@ class VariableList
 {
 public:
 	void addVariable(std::string_view name, std::string_view value);
-	void addVariable(variableTuple tuple);
 
 	void loadVariablesFromFile(const std::string& path);
 	void saveVariablesToFile(const std::string& path);
