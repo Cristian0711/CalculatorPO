@@ -32,7 +32,7 @@ void VariableList::loadVariablesFromFile(const std::string& path)
 	std::string line;
 
 	if (file.fail())
-		throw std::exception("CALCULATOR: Invalid file path!");
+		throw InvalidFilePath();
 
 	size_t size = 0;
 	file.read(reinterpret_cast<char*>(&size), sizeof(size_t));
@@ -64,7 +64,7 @@ void VariableList::saveVariablesToFile(const std::string& path) const
 	std::ofstream file(path, std::ios::binary);
 
 	if (file.fail())
-		throw std::exception("CALCULATOR: Invalid file path!");
+		throw InvalidFilePath();
 
 	size_t size = variableList.size();
 	file.write(reinterpret_cast<const char*>(&size), sizeof(size_t));

@@ -236,7 +236,7 @@ void Calculator::run(std::string_view expression)
 			throw InvalidSelection();
 		}
 	}
-	catch (const std::exception& exception)
+	catch (const CalculatorException& exception)
 	{
 		std::cout << exception.what() << '\n';
 	}

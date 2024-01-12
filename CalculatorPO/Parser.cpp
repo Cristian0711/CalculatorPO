@@ -226,7 +226,7 @@ void Parser::processVariable(TokenList& tokenList, const VariableList& variableL
 void Parser::getTokens(TokenList& tokenList, const VariableList& variableList, std::string_view consoleExpression)
 {
 	if (consoleExpression.length() == 0)
-		throw std::exception("CALCULATOR: No input given!");
+		throw NoInputGiven();
 
 	size_t startIndex = 0;
 	assignVariable(consoleExpression, startIndex);

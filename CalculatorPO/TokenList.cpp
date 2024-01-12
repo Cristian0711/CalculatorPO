@@ -6,6 +6,7 @@ const Token* TokenList::priorityOperatorOfTokens(const Token* first, const Token
 	if (first == nullptr || second == nullptr)
 		return nullptr;
 
+	//const Token* returnOperator = std::max({ first, second, third }, [](const Token* s1, const Token* s2) { return (s1 != nullptr && s2 != nullptr) && (s1->priority() < s2->priority()); });
 	const Token* returnOperator = nullptr;
 
 	if (third != nullptr)

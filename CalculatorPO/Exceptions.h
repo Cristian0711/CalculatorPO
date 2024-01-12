@@ -162,3 +162,15 @@ public:
 		return "invalid selection!";
 	}
 };
+
+class NoInputGiven : public CalculatorException {
+public:
+	const char* what() const
+	{
+		return "CALCULATOR: No input given!";
+	}
+	const char* print() const
+	{
+		return "no input given!";
+	}
+};
