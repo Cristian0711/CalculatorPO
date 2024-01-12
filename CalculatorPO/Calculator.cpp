@@ -124,7 +124,8 @@ void Calculator::handleConsoleExpression()
 	std::cin.ignore(LLONG_MAX, '\n');
 	std::getline(std::cin, consoleExpression);
 
-	std::cout << "Answer: " << solve(consoleExpression) << '\n';
+	Token answer = solve(consoleExpression);
+	std::cout << "Answer: " << answer << '\n';
 }
 
 void Calculator::handleFileExpression(bool saveToFile)
@@ -154,13 +155,14 @@ void Calculator::handleFileExpression(bool saveToFile)
 		if (line.empty())
 			continue;
 
+		Token answer = solve(line);
 		if (saveToFile)
 		{
-			saveFileStream << line << '=' << solve(line) << '\n';
+			saveFileStream << line << '=' << answer << '\n';
 		}
 		else
 		{
-			std::cout << line << '=' << solve(line) << '\n';
+			std::cout << line << '=' << answer << '\n';
 		}
 		tokenList.clear();
 	}
@@ -189,7 +191,8 @@ void Calculator::run(std::string_view expression)
 {
 	if (expression.length() > 0)
 	{
-		std::cout << "Answer: " << solve(expression) << '\n';
+		Token answer = solve(expression);
+		std::cout << "Answer: " << answer << '\n';
 		return;
 	}
 
